@@ -109,21 +109,28 @@ class Humanoid(LeggedRobot):
         term_contact = torch.norm(
                 self.contact_forces[:, self.termination_contact_indices, :],
                 dim=-1)
+        #print("self.termination_contact_indices", self.termination_contact_indices)
+        #print("self.contact_forces", self.contact_forces[0])
         self.reset_buf = torch.any((term_contact > 1.), dim=1)
-
+        #print("1 term_contact", torch.any((term_contact > 1.), dim=1))
         # Termination for velocities, orientation, and low height
         self.reset_buf |= torch.any(
           torch.norm(self.base_lin_vel, dim=-1, keepdim=True) > 10., dim=1)
+        #print("2 self.base_lin_vel", torch.any(torch.norm(self.base_lin_vel, dim=-1, keepdim=True) > 10., dim=1))
         self.reset_buf |= torch.any(
-          torch.norm(self.base_ang_vel, dim=-1, keepdim=True) > 5., dim=1)
+           torch.norm(self.base_ang_vel, dim=-1, keepdim=True) > 5., dim=1)
+        #print("3 self.base_ang_vel", torch.norm(self.base_ang_vel, dim=-1, keepdim=True))
         self.reset_buf |= torch.any(
           torch.abs(self.projected_gravity[:, 0:1]) > 0.7, dim=1)
+        #print("4 torch.abs(self.projected_gravity[:, 0:1])",  torch.any(torch.abs(self.projected_gravity[:, 0:1]) > 0.7, dim=1))
         self.reset_buf |= torch.any(
-          torch.abs(self.projected_gravity[:, 1:2]) > 0.7, dim=1)
+           torch.abs(self.projected_gravity[:, 1:2]) > 0.7, dim=1)
+        #print("5 torch.abs(self.projected_gravity[:, 1:2])", torch.any(torch.abs(self.projected_gravity[:, 1:2]) > 0.7, dim=1))
         self.reset_buf |= torch.any(self.base_pos[:, 2:3] < 0.3, dim=1)
-
+        #print("6 self.base_pos[:, 2:3]",torch.any(self.base_pos[:, 2:3] < 0.3, dim=1)    )
         # # no terminal reward for time-outs
         self.time_out_buf = self.episode_length_buf > self.max_episode_length
+        #print("7 self.time_out_buf", self.time_out_buf)
         self.reset_buf |= self.time_out_buf
 
 # ########################## REWARDS ######################## #
@@ -148,6 +155,7 @@ class Humanoid(LeggedRobot):
     def _reward_base_height(self):
         # Reward tracking specified base height
         base_height = self.root_states[:, 2].unsqueeze(1)
+        #print("base_height", base_height)
         error = (base_height-self.cfg.rewards.base_height_target)
         error *= self.obs_scales.base_z
         error = error.flatten()

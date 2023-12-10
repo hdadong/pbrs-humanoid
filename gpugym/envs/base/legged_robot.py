@@ -78,6 +78,7 @@ class LeggedRobot(BaseTask):
         if hasattr(self, "_custom_init"):
             self._custom_init(cfg)
         self.init_done = True
+        self.command_torque = []
 
 
     def step(self, actions):
@@ -105,7 +106,6 @@ class LeggedRobot(BaseTask):
 
             if self.cfg.asset.disable_motors:
                 self.torques[:] = 0.
-
             self.gym.set_dof_actuation_force_tensor(self.sim, gymtorch.unwrap_tensor(self.torques))
             self.gym.simulate(self.sim)
             if self.device == 'cpu':
@@ -427,7 +427,19 @@ class LeggedRobot(BaseTask):
                                     + self.default_dof_pos \
                                     - self.dof_pos) \
                     - self.d_gains*self.dof_vel
+            # torques = torch.zeros_like(torques)
+            # torques[:, 3] = 50
+            # torques[:, 2] = 0
 
+            # self.command_torque.append(torques.cpu().numpy().reshape(-1, 10))
+ 
+            # arr = (np.array(self.command_torque).reshape(-1, 10))
+            # #print(arr.shape)
+            # max_value = np.amax(arr, axis=0)
+            # min_value = np.amin(arr, axis=0)
+
+            # print("每个维度的最大值：", max_value)
+            # print("每个维度的最小值：", min_value)
         elif self.cfg.control.control_type=="T":
             torques = actions * self.cfg.control.action_scale
 
@@ -520,7 +532,6 @@ class LeggedRobot(BaseTask):
                                     self.root_vel_range[:, 0],
                                     self.root_vel_range[:, 1],
                                     device=self.device)
-
 
     def _push_robots(self):
         """ Random pushes the robots. Emulates an impulse by setting a randomized base velocity. 
@@ -710,6 +721,7 @@ class LeggedRobot(BaseTask):
             angle = self.cfg.init_state.default_joint_angles[name]
             self.default_dof_pos[i] = self.cfg.init_state.default_joint_angles[name]
             found = False
+            print('self.cfg.control.stiffness', self.cfg.control.stiffness)
             for dof_name in self.cfg.control.stiffness.keys():
                 if dof_name in name:
                     self.p_gains[i] = self.cfg.control.stiffness[dof_name]
@@ -872,7 +884,7 @@ class LeggedRobot(BaseTask):
         termination_contact_names = []
         for name in self.cfg.asset.terminate_after_contacts_on:
             termination_contact_names.extend([s for s in body_names if name in s])
-
+        print(termination_contact_names)
         base_init_state_list = self.cfg.init_state.pos + self.cfg.init_state.rot + self.cfg.init_state.lin_vel + self.cfg.init_state.ang_vel
         self.base_init_state = to_torch(base_init_state_list, device=self.device, requires_grad=False)
         start_pose = gymapi.Transform()
@@ -912,8 +924,22 @@ class LeggedRobot(BaseTask):
         self.termination_contact_indices = torch.zeros(len(termination_contact_names), dtype=torch.long, device=self.device, requires_grad=False)
         for i in range(len(termination_contact_names)):
             self.termination_contact_indices[i] = self.gym.find_actor_rigid_body_handle(self.envs[0], self.actor_handles[0], termination_contact_names[i])
-
-
+            print(self.termination_contact_indices[i], termination_contact_names[i])
+        joint_name=[
+        'hip_yaw_r',
+        'hip_roll_r',
+        'hip_pitch_r',
+        'knee_pitch_r',
+        'ankle_pitch_r',
+        'hip_yaw_l',
+        'hip_roll_l',
+        'hip_pitch_l',
+        'knee_pitch_l',
+        'ankle_pitch_l',
+        
+        ]
+        for i in joint_name:
+            print("find_actor_joint_handle", i, self.gym.find_actor_joint_handle(self.envs[0], self.actor_handles[0], i))
     def _get_env_origins(self):
         """ Sets environment origins. On rough terrain the origins are defined by the terrain platforms.
             Otherwise create a grid.

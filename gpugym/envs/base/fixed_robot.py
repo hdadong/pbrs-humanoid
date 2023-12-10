@@ -76,7 +76,6 @@ class FixedRobot(BaseTask):
                     next_torques_idx += 1
                 else:
                     torques_to_gym_tensor[:, dof_idx] = torch.zeros(size=(self.num_envs,), device=self.device)
-
             self.gym.set_dof_actuation_force_tensor(self.sim,
                                         gymtorch.unwrap_tensor(torques_to_gym_tensor))
             self.gym.simulate(self.sim)
@@ -355,13 +354,14 @@ class FixedRobot(BaseTask):
             torques = self.p_gains*(actions_scaled+offset_pos -
                                     self.dof_pos[:, self.act_idx]) \
                         - self.d_gains*self.dof_vel[:, self.act_idx]
+            print("torques", torques)
         elif control_type == "T":
             torques = actions_scaled
         elif control_type=="Td":
             torques = actions_scaled - self.d_gains*self.dof_vel
         else:
             raise NameError(f"Unknown controller type: {control_type}")
-
+        print("torques", torques)
         return torch.clip(torques, -self.torque_limits, self.torque_limits)
 
 
@@ -612,6 +612,7 @@ class FixedRobot(BaseTask):
         termination_contact_names = []
         for name in self.cfg.asset.terminate_after_contacts_on:
             termination_contact_names.extend([s for s in body_names if name in s])
+        print(termination_contact_names)
 
         # base_init_state_list = self.cfg.init_state.pos + \
         #                         self.cfg.init_state.rot + \
@@ -667,7 +668,7 @@ class FixedRobot(BaseTask):
         self.termination_contact_indices = torch.zeros(len(termination_contact_names), dtype=torch.long, device=self.device, requires_grad=False)
         for i in range(len(termination_contact_names)):
             self.termination_contact_indices[i] = self.gym.find_actor_rigid_body_handle(self.envs[0], self.actor_handles[0], termination_contact_names[i])
-
+        print(self.termination_contact_indices)
     def _get_env_origins(self):  # TODO: do without terrain
         """ Sets environment origins. On rough terrain the origins are defined by the terrain platforms.
             Otherwise create a grid.

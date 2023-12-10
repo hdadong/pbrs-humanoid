@@ -30,9 +30,9 @@ class HumanoidCfg(LeggedRobotCfg):
 
         class ranges:
             # TRAINING COMMAND RANGES #
-            lin_vel_x = [0, 1.0]        # min max [m/s]
-            lin_vel_y = [-0.1, 0.001]   # min max [m/s]
-            ang_vel_yaw = [-0.0005, 0.0005]     # min max [rad/s]
+            lin_vel_x = [0, 4.5]        # min max [m/s]
+            lin_vel_y = [-0.75, 0.75]   # min max [m/s]
+            ang_vel_yaw = [-2., 2.]     # min max [rad/s]
             heading = [0., 0.]
 
             # PLAY COMMAND RANGES #
@@ -44,7 +44,7 @@ class HumanoidCfg(LeggedRobotCfg):
     class init_state(LeggedRobotCfg.init_state):
         reset_mode = 'reset_to_range'
         penetration_check = False
-        pos = [0., 0., 0.48]        # x,y,z [m]
+        pos = [0., 0., 0.75]        # x,y,z [m]
         rot = [0.0, 0.0, 0.0, 1.0]  # x,y,z,w [quat]
         lin_vel = [0.0, 0.0, 0.0]   # x,y,z [m/s]
         ang_vel = [0.0, 0.0, 0.0]   # x,y,z [rad/s]
@@ -53,84 +53,48 @@ class HumanoidCfg(LeggedRobotCfg):
         root_pos_range = [
             [0., 0.],
             [0., 0.],
-            [0.48, 0.48],
-            [-torch.pi/100, torch.pi/100],
-            [-torch.pi/100, torch.pi/100],
-            [-torch.pi/100, torch.pi/100]
+            [0.72, 0.72],
+            [-torch.pi/10, torch.pi/10],
+            [-torch.pi/10, torch.pi/10],
+            [-torch.pi/10, torch.pi/10]
         ]
 
         # ranges for [v_x, v_y, v_z, w_x, w_y, w_z]
         root_vel_range = [
-            [-.05, .05],
-            [-.05, .05],
-            [-.05, .05],
-            [-.05, .05],
-            [-.05, .05],
-            [-.05, .05]
+            [-.5, .5],
+            [-.5, .5],
+            [-.5, .5],
+            [-.5, .5],
+            [-.5, .5],
+            [-.5, .5]
         ]
 
-        # default_joint_angles = {
-        #     'left_hip_yaw': 0.,
-        #     'left_hip_abad': 0.,
-        #     'left_hip_pitch': -0.2,
-        #     'left_knee': 0.25,  # 0.6
-        #     'left_ankle': 0.0,
-        #     'right_hip_yaw': 0.,
-        #     'right_hip_abad': 0.,
-        #     'right_hip_pitch': -0.2,
-        #     'right_knee': 0.25,  # 0.6
-        #     'right_ankle': 0.0,
-        # }
         default_joint_angles = {
-            'hip_yaw_l': -2.6794896523796297e-08,
-            'hip_yaw_r': -2.6794896523796297e-08,
-            'hip_roll_l': -0.0022512623568848866,
-            'hip_roll_r': 0.0022512623568848866,
-            'hip_pitch_l': 0.0042626806266173,
-            'hip_pitch_r': 0.0042626806266173,
-            'knee_pitch_l': -0.0061344649420423,
-            'knee_pitch_r': -0.0061344649420423,
-            'ankle_pitch_l': 0.42187178431542494,
-            'ankle_pitch_r': 0.42187178431542494,
-            
+            'left_hip_yaw': 0.,
+            'left_hip_abad': 0.,
+            'left_hip_pitch': -0.2,
+            'left_knee': 0.25,  # 0.6
+            'left_ankle': 0.0,
+            'right_hip_yaw': 0.,
+            'right_hip_abad': 0.,
+            'right_hip_pitch': -0.2,
+            'right_knee': 0.25,  # 0.6
+            'right_ankle': 0.0,
         }
 
-        # dof_pos_range = {
-        #     'left_hip_yaw': [-0.1, 0.1],
-        #     'left_hip_abad': [-0.2, 0.2],
-        #     'left_hip_pitch': [-0.2, 0.2],
-        #     'left_knee': [0.6, 0.7],
-        #     'left_ankle': [-0.3, 0.3],
-        #     'right_hip_yaw': [-0.1, 0.1],
-        #     'right_hip_abad': [-0.2, 0.2],
-        #     'right_hip_pitch': [-0.2, 0.2],
-        #     'right_knee': [0.6, 0.7],
-        #     'right_ankle': [-0.3, 0.3],
-        # }
-        # dof_pos_range = {
-        #     'hip_yaw_l': [-0.2, 0.2],
-        #     'hip_yaw_r': [-0.2, 0.2],
-        #     'hip_roll_l': [-0.2, 0.2],
-        #     'hip_roll_r': [-0.2, 0.2],
-        #     'hip_pitch_l': [-1.0, 1.0],
-        #     'hip_pitch_r': [-1.0, 1.0],
-        #     'knee_pitch_l': [-1.0, 1.0],
-        #     'knee_pitch_r': [-1.0, 1.0],
-        #     'ankle_pitch_l': [-1.0, 1.0],
-        #     'ankle_pitch_r': [-1.0, 1.0],
-        # }
         dof_pos_range = {
-            'hip_yaw_l': [-0.8, 0.8],
-            'hip_yaw_r': [-0.8, 0.8],
-            'hip_roll_l': [-0.15, 0.6],
-            'hip_roll_r': [-0.6, 0.15],
-            'hip_pitch_l': [-0.05, 1.30],
-            'hip_pitch_r': [-0.05, 1.30],
-            'knee_pitch_l': [-1.0, 0.12],
-            'knee_pitch_r': [-1.0, 0.12],
-            'ankle_pitch_l': [-0.7, 0.7],
-            'ankle_pitch_r': [-0.7, 0.7],
+            'left_hip_yaw': [-0.1, 0.1],
+            'left_hip_abad': [-0.2, 0.2],
+            'left_hip_pitch': [-0.2, 0.2],
+            'left_knee': [0.6, 0.7],
+            'left_ankle': [-0.3, 0.3],
+            'right_hip_yaw': [-0.1, 0.1],
+            'right_hip_abad': [-0.2, 0.2],
+            'right_hip_pitch': [-0.2, 0.2],
+            'right_knee': [0.6, 0.7],
+            'right_ankle': [-0.3, 0.3],
         }
+
         dof_vel_range = {
             'left_hip_yaw': [-0.1, 0.1],
             'left_hip_abad': [-0.1, 0.1],
@@ -143,55 +107,32 @@ class HumanoidCfg(LeggedRobotCfg):
             'right_knee': [-0.1, 0.1],
             'right_ankle': [-0.1, 0.1],
         }
-        # dof_vel_range = {
-        #     'hip_yaw_l': [-0.00, 0.00],
-        #     'hip_yaw_r': [-0.0, 0.00],
-        #     'hip_roll_l': [-0.00, 0.00],
-        #     'hip_roll_r': [-0.00, 0.00],
-        #     'hip_pitch_l': [-0.00, 0.00],
-        #     'hip_pitch_r': [-0.00, 0.00],
-        #     'knee_pitch_l': [-0.00, 0.00],
-        #     'knee_pitch_r': [-0.00, 0.00],
-        #     'ankle_pitch_l': [-0.00, 0.00],
-        #     'ankle_pitch_r': [-0.00, 0.00],
-        # }
+
     class control(LeggedRobotCfg.control):
         # stiffness and damping for joints
-        # stiffness = {
-        #     'left_hip_yaw': 30.,
-        #     'left_hip_abad': 30.,
-        #     'left_hip_pitch': 30.,
-        #     'left_knee': 30.,
-        #     'left_ankle': 30.,
-        #     'right_hip_yaw': 30.,
-        #     'right_hip_abad': 30.,
-        #     'right_hip_pitch': 30.,
-        #     'right_knee': 30.,
-        #     'right_ankle': 30.,
-        # }
         stiffness = {
-            'hip_yaw_l': 0.1,
-            'hip_yaw_r': 0.1,
-            'hip_roll_l': 1.,
-            'hip_roll_r': 1.,
-            'hip_pitch_l': 1.,
-            'hip_pitch_r': 1.,
-            'knee_pitch_l': 1.,
-            'knee_pitch_r': 1.,
-            'ankle_pitch_l': 0.1,
-            'ankle_pitch_r': 0.1,
+            'left_hip_yaw': 30.,
+            'left_hip_abad': 30.,
+            'left_hip_pitch': 30.,
+            'left_knee': 30.,
+            'left_ankle': 30.,
+            'right_hip_yaw': 30.,
+            'right_hip_abad': 30.,
+            'right_hip_pitch': 30.,
+            'right_knee': 30.,
+            'right_ankle': 30.,
         }
         damping = {
-            'hip_yaw_l': 0.01,
-            'hip_yaw_r': 0.01,
-            'hip_roll_l': 0.01,
-            'hip_roll_r': 0.01,
-            'hip_pitch_l': 0.01,
-            'hip_pitch_r': 0.01,
-            'knee_pitch_l': 0.01,
-            'knee_pitch_r': 0.01,
-            'ankle_pitch_l': 0.0015,
-            'ankle_pitch_r':0.0015,
+            'left_hip_yaw': 5.,
+            'left_hip_abad': 5.,
+            'left_hip_pitch': 5.,
+            'left_knee': 5.,
+            'left_ankle': 5.,
+            'right_hip_yaw': 5.,
+            'right_hip_abad': 5.,
+            'right_hip_pitch': 5.,
+            'right_knee': 5.,
+            'right_ankle': 5.
         }
 
         action_scale = 1.0
@@ -207,46 +148,28 @@ class HumanoidCfg(LeggedRobotCfg):
 
         push_robots = True
         push_interval_s = 2.5
-        max_push_vel_xy = 0.05
+        max_push_vel_xy = 0.5
 
     class asset(LeggedRobotCfg.asset):
-        # file = '{LEGGED_GYM_ROOT_DIR}'\
-        #     '/resources/robots/mit_humanoid/mit_humanoid_fixed_arms.urdf'
         file = '{LEGGED_GYM_ROOT_DIR}'\
-            '/resources/robots/bruce/bruce.urdf'
-        keypoints = ["base_link"]
-        end_effectors = ['ankle_pitch_link_l', 'ankle_pitch_link_r']
-        foot_name = 'ankle_pitch'
-        # terminate_after_contacts_on = [
-        #     'base',
-        #     'left_upper_leg',
-        #     'left_lower_leg',
-        #     'right_upper_leg',
-        #     'right_lower_leg',
-        #     'left_upper_arm',
-        #     'right_upper_arm',
-        #     'left_lower_arm',
-        #     'right_lower_arm',
-        #     'left_hand',
-        #     'right_hand',
-        # ]
+            '/resources/robots/mit_humanoid/mit_humanoid_fixed_arms.urdf'
+        keypoints = ["base"]
+        end_effectors = ['left_foot', 'right_foot']
+        foot_name = 'foot'
         terminate_after_contacts_on = [
-            'base_link',
-            'hip_yaw_link_l',
-            'hip_roll_link_l',
-            'hip_pitch_link_l',
-            'knee_pitch_link_l',
-            'hip_yaw_link_r',
-            'hip_roll_link_r',
-            'hip_pitch_link_r',
-            'knee_pitch_link_r',
-            'shoulder_pitch_link_l',
-            'shoulder_roll_link_l',
-            'elbow_pitch_link_l',
-            'shoulder_pitch_link_r',
-            'shoulder_roll_link_r',
-            'elbow_pitch_link_r',
+            'base',
+            'left_upper_leg',
+            'left_lower_leg',
+            'right_upper_leg',
+            'right_lower_leg',
+            'left_upper_arm',
+            'right_upper_arm',
+            'left_lower_arm',
+            'right_lower_arm',
+            'left_hand',
+            'right_hand',
         ]
+
         disable_gravity = False
         disable_actions = False
         disable_motors = False
@@ -258,12 +181,12 @@ class HumanoidCfg(LeggedRobotCfg):
 
         # Check GymDofDriveModeFlags
         # (0: none, 1: pos tgt, 2: vel target, 3: effort)
-        default_dof_drive_mode = 3  
+        default_dof_drive_mode = 3
 
     class rewards(LeggedRobotCfg.rewards):
         # ! "Incorrect" specification of height
         # base_height_target = 0.7
-        base_height_target = 0.48
+        base_height_target = 0.62
         soft_dof_pos_limit = 0.9
         soft_dof_vel_limit = 0.9
         soft_torque_limit = 0.8
@@ -323,9 +246,9 @@ class HumanoidCfg(LeggedRobotCfg):
         class noise_scales(LeggedRobotCfg.noise.noise_scales):
             base_z = 0.05
             dof_pos = 0.005
-            dof_vel = 0.001
-            lin_vel = 0.00001
-            ang_vel = 0.00005
+            dof_vel = 0.01
+            lin_vel = 0.1
+            ang_vel = 0.05
             gravity = 0.05
             in_contact = 0.1
             height_measurements = 0.1
@@ -360,7 +283,7 @@ class HumanoidCfgPPO(LeggedRobotCfgPPO):
 
     class runner(LeggedRobotCfgPPO.runner):
         num_steps_per_env = 24
-        max_iterations = 100000
+        max_iterations = 1000
         run_name = 'ICRA2023'
         experiment_name = 'PBRS_HumanoidLocomotion'
         save_interval = 50
