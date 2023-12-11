@@ -180,12 +180,13 @@ class Humanoid(LeggedRobot):
         error += self.sqrdexp(
             (self.dof_pos[:, 5]) / self.cfg.normalization.obs_scales.dof_pos)
         # Ab/ad joint symmetry
+        
         error += self.sqrdexp(
             (self.dof_pos[:, 1] - self.dof_pos[:, 6])
             / self.cfg.normalization.obs_scales.dof_pos)
         # Pitch joint symmetry
         error += self.sqrdexp(
-            (self.dof_pos[:, 2] + self.dof_pos[:, 7])
+            (self.dof_pos[:, 2]-0.625 + self.dof_pos[:, 7]-0.625)
             / self.cfg.normalization.obs_scales.dof_pos)
         return error/4
 

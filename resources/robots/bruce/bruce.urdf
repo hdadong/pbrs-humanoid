@@ -326,8 +326,8 @@ __status__    = "Production"
     <axis
       xyz="0 0 1" />
     <limit
-      lower="-3.1415"
-      upper="3.1415"
+      lower="-1.0"
+      upper="1.0"
       effort="1000"
       velocity="1000" />
   </joint>
@@ -608,8 +608,8 @@ __status__    = "Production"
     <axis
       xyz="0 0 1" />
     <limit
-      lower="-3.1415"
-      upper="3.1415"
+      lower="-1.0"
+      upper="1.0"
       effort="1000"
       velocity="1000" />
   </joint>

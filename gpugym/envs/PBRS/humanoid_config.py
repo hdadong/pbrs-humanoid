@@ -31,7 +31,7 @@ class HumanoidCfg(LeggedRobotCfg):
         class ranges:
             # TRAINING COMMAND RANGES #
             lin_vel_x = [0, 1.0]        # min max [m/s]
-            lin_vel_y = [-0.1, 0.001]   # min max [m/s]
+            lin_vel_y = [-0.1, 0.1]   # min max [m/s]
             ang_vel_yaw = [-0.0005, 0.0005]     # min max [rad/s]
             heading = [0., 0.]
 
@@ -120,41 +120,41 @@ class HumanoidCfg(LeggedRobotCfg):
         #     'ankle_pitch_r': [-1.0, 1.0],
         # }
         dof_pos_range = {
-            'hip_yaw_l': [-0.8, 0.8],
-            'hip_yaw_r': [-0.8, 0.8],
-            'hip_roll_l': [-0.15, 0.6],
-            'hip_roll_r': [-0.6, 0.15],
+            'hip_yaw_l': [-0.3, 0.3],
+            'hip_yaw_r': [-0.3, 0.3],
+            'hip_roll_l': [-0.15, 0.25],
+            'hip_roll_r': [-0.25, 0.15],
             'hip_pitch_l': [-0.05, 1.30],
             'hip_pitch_r': [-0.05, 1.30],
-            'knee_pitch_l': [-1.0, 0.12],
-            'knee_pitch_r': [-1.0, 0.12],
-            'ankle_pitch_l': [-0.7, 0.7],
-            'ankle_pitch_r': [-0.7, 0.7],
-        }
-        dof_vel_range = {
-            'left_hip_yaw': [-0.1, 0.1],
-            'left_hip_abad': [-0.1, 0.1],
-            'left_hip_pitch': [-0.1, 0.1],
-            'left_knee': [-0.1, 0.1],
-            'left_ankle': [-0.1, 0.1],
-            'right_hip_yaw': [-0.1, 0.1],
-            'right_hip_abad': [-0.1, 0.1],
-            'right_hip_pitch': [-0.1, 0.1],
-            'right_knee': [-0.1, 0.1],
-            'right_ankle': [-0.1, 0.1],
+            'knee_pitch_l': [-1.0, 0.25],
+            'knee_pitch_r': [-1.0, 0.25],
+            'ankle_pitch_l': [-1.0, 1.0],
+            'ankle_pitch_r': [-1.0, 1.0],
         }
         # dof_vel_range = {
-        #     'hip_yaw_l': [-0.00, 0.00],
-        #     'hip_yaw_r': [-0.0, 0.00],
-        #     'hip_roll_l': [-0.00, 0.00],
-        #     'hip_roll_r': [-0.00, 0.00],
-        #     'hip_pitch_l': [-0.00, 0.00],
-        #     'hip_pitch_r': [-0.00, 0.00],
-        #     'knee_pitch_l': [-0.00, 0.00],
-        #     'knee_pitch_r': [-0.00, 0.00],
-        #     'ankle_pitch_l': [-0.00, 0.00],
-        #     'ankle_pitch_r': [-0.00, 0.00],
+        #     'left_hip_yaw': [-0.1, 0.1],
+        #     'left_hip_abad': [-0.1, 0.1],
+        #     'left_hip_pitch': [-0.1, 0.1],
+        #     'left_knee': [-0.1, 0.1],
+        #     'left_ankle': [-0.1, 0.1],
+        #     'right_hip_yaw': [-0.1, 0.1],
+        #     'right_hip_abad': [-0.1, 0.1],
+        #     'right_hip_pitch': [-0.1, 0.1],
+        #     'right_knee': [-0.1, 0.1],
+        #     'right_ankle': [-0.1, 0.1],
         # }
+        dof_vel_range = {
+            'hip_yaw_l': [-2.00, 3.00],
+            'hip_yaw_r': [-3.00, 2.00],
+            'hip_roll_l': [-1.30, 1.30],
+            'hip_roll_r': [-1.30, 1.30],
+            'hip_pitch_l': [-4.50, 4.00],
+            'hip_pitch_r': [-4.50, 4.00],
+            'knee_pitch_l': [-9.00, 9.00],
+            'knee_pitch_r': [-9.00, 9.00],
+            'ankle_pitch_l': [-50.00, 30.00],
+            'ankle_pitch_r': [-50.00, 30.00],
+        }
     class control(LeggedRobotCfg.control):
         # stiffness and damping for joints
         # stiffness = {
@@ -170,28 +170,28 @@ class HumanoidCfg(LeggedRobotCfg):
         #     'right_ankle': 30.,
         # }
         stiffness = {
-            'hip_yaw_l': 0.1,
-            'hip_yaw_r': 0.1,
+            'hip_yaw_l': 1.,
+            'hip_yaw_r': 1.,
             'hip_roll_l': 1.,
             'hip_roll_r': 1.,
-            'hip_pitch_l': 1.,
-            'hip_pitch_r': 1.,
-            'knee_pitch_l': 1.,
-            'knee_pitch_r': 1.,
-            'ankle_pitch_l': 0.1,
-            'ankle_pitch_r': 0.1,
+            'hip_pitch_l': 2.,
+            'hip_pitch_r': 2.,
+            'knee_pitch_l': 2.,
+            'knee_pitch_r': 2.,
+            'ankle_pitch_l': 0.2,
+            'ankle_pitch_r': 0.2,
         }
         damping = {
             'hip_yaw_l': 0.01,
             'hip_yaw_r': 0.01,
             'hip_roll_l': 0.01,
             'hip_roll_r': 0.01,
-            'hip_pitch_l': 0.01,
-            'hip_pitch_r': 0.01,
-            'knee_pitch_l': 0.01,
-            'knee_pitch_r': 0.01,
-            'ankle_pitch_l': 0.0015,
-            'ankle_pitch_r':0.0015,
+            'hip_pitch_l': 0.02,
+            'hip_pitch_r': 0.02,
+            'knee_pitch_l': 0.02,
+            'knee_pitch_r': 0.02,
+            'ankle_pitch_l': 0.003,
+            'ankle_pitch_r':0.003,
         }
 
         action_scale = 1.0
@@ -307,7 +307,7 @@ class HumanoidCfg(LeggedRobotCfg):
 
             # Sweep values: [0.1, 0.5, 2.0, 5.0, 10.]
             # Default: 1.0
-            jointReg_pb = 1.0
+            jointReg_pb = 10.0
 
     class normalization(LeggedRobotCfg.normalization):
         class obs_scales(LeggedRobotCfg.normalization.obs_scales):

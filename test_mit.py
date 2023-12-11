@@ -51,9 +51,9 @@ if viewer is None:
     quit()
 
 # load ball asset
-asset_root = "/home/bigeast/pbrs-humanoid/resources/robots/bruce/"
+asset_root = "/home/bigeast/pbrs-humanoid/resources/robots/mit_humanoid/"
 
-asset_file = "bruce.urdf"
+asset_file = "mit_humanoid_fixed_arms.urdf"
 asset_options = gymapi.AssetOptions()
 asset_options.fix_base_link = True
 asset = gym.load_asset(sim, asset_root, asset_file, asset_options)
@@ -79,7 +79,7 @@ gym.subscribe_viewer_keyboard_event(viewer, gymapi.KEY_R, "reset")
 env = gym.create_env(sim, env_lower, env_upper, 1)
 pose = gymapi.Transform()
 pose.r = gymapi.Quat.from_euler_zyx(-math.pi*0.5, 0, 0)
-pose.p = gymapi.Vec3(0, 0.48, 0)
+pose.p = gymapi.Vec3(0, 0.72, 0)
 handler = gym.create_actor(env, asset, pose, None, -1, 1)
 
 
