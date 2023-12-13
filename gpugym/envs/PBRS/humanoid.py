@@ -137,6 +137,97 @@ class Humanoid(LeggedRobot):
 
     # * "True" rewards * #
 
+    def _reward_feat_alternate_leading(self):
+        # Reward long steps with anti-symmetric pattern+
+        #print("contact_forces", self.contact_forces[:, self.feet_indices, 2])
+        contact = self.contact_forces[:, self.feet_indices, 2] > 1.
+        contact_filt = torch.logical_or(contact, self.last_contacts) 
+
+        left_foot_contact = contact_filt[:, 0]
+        right_foot_contact = contact_filt[:, 1]
+
+        
+        # New code for alternate leading behavior
+        left_joint_pos = self.dof_pos[:, 2]  # Assuming index 2 is left hip joint position
+        right_joint_pos = self.dof_pos[:, 7]  # Assuming index 7 is right hip joint position
+
+        # Check if left leg is leading and in contact, and then right leg takes the lead
+        left_leading_and_contact =  torch.logical_and((left_joint_pos > right_joint_pos) , left_foot_contact)
+        right_leading_and_contact = torch.logical_and((left_joint_pos < right_joint_pos) , right_foot_contact)
+        
+        left_over_right = torch.logical_and(left_leading_and_contact, self.feet_ahead[:,1])
+        right_over_left = torch.logical_and(right_leading_and_contact, self.feet_ahead[:,0])
+        
+        
+        #alternate_leading_reward = torch.where(left_over_right, 1.0, 0.0)
+        #alternate_leading_reward2 = torch.where(right_over_left, 1.0, 0.0)
+
+        # false, falses
+        self.feet_ahead[:,0] = torch.where(self.feet_ahead[:,0]==self.feet_ahead[:,1], left_leading_and_contact, self.feet_ahead[:,0])
+        self.feet_ahead[:,1] = torch.where(self.feet_ahead[:,0]==self.feet_ahead[:,1], right_leading_and_contact, self.feet_ahead[:,1])
+        
+        
+        self.feet_ahead[:,0] = torch.where(left_over_right, True, self.feet_ahead[:,0])
+        self.feet_ahead[:,1] = torch.where(left_over_right, False, self.feet_ahead[:,1])
+        
+        self.feet_ahead[:,0] = torch.where(right_over_left, False, self.feet_ahead[:,0])
+        self.feet_ahead[:,1] = torch.where(right_over_left, True, self.feet_ahead[:,1])
+        
+
+
+        #anti_symmetric_pattern = torch.logical_xor(self.feet_ahead[:,0], self.feet_ahead[:,1])
+
+        # Calculate reward for anti-symmetric steps
+        #print(self.feet_air_time.shape, first_contact.shape, anti_symmetric_pattern.shape, anti_symmetric_pattern.unsqueeze(1).repeat(1,2).shape)
+        rew_anti_symmetric = self.feet_lead_time[:,1]  * left_over_right * (torch.norm(self.commands[:, :2], dim=1) > 0.1)
+        rew_anti_symmetric += self.feet_lead_time[:,0]  * right_over_left * (torch.norm(self.commands[:, :2], dim=1) > 0.1)
+        
+        self.feet_lead_time += self.dt
+        self.feet_lead_time[:,0] *= self.feet_ahead[:,0]
+        self.feet_lead_time[:,1] *= self.feet_ahead[:,1]
+
+
+        # Combine the rewards
+        total_reward = rew_anti_symmetric
+
+        
+        
+        
+        
+        
+        
+        return total_reward
+
+
+    def _reward_feet_air_time(self):
+        # Reward long steps with anti-symmetric pattern+
+        #print("contact_forces", self.contact_forces[:, self.feet_indices, 2])
+        contact = self.contact_forces[:, self.feet_indices, 2] > 1.
+        contact_filt = torch.logical_or(contact, self.last_contacts) 
+        self.last_contacts = contact
+        first_contact = (self.feet_air_time > 0.) * contact_filt
+        self.feet_air_time += self.dt
+
+        # Identify anti-symmetric step pattern
+        # Assuming feet_indices[0] and feet_indices[1] correspond to left and right foot respectively
+        #print(contact_filt.shape)
+        left_foot_contact = contact_filt[:, 0]
+        right_foot_contact = contact_filt[:, 1]
+        anti_symmetric_pattern = torch.logical_xor(left_foot_contact, right_foot_contact)
+
+        # Calculate reward for anti-symmetric steps
+        #print(self.feet_air_time.shape, first_contact.shape, anti_symmetric_pattern.shape, anti_symmetric_pattern.unsqueeze(1).repeat(1,2).shape)
+        rew_anti_symmetric = torch.sum(self.feet_air_time * first_contact * anti_symmetric_pattern.unsqueeze(1).repeat(1,2), dim=1)
+        rew_anti_symmetric *= torch.norm(self.commands[:, :2], dim=1) > 0.1  # No reward for zero command
+
+        self.feet_air_time *= ~contact_filt
+        #print("rew_anti_symmetric", rew_anti_symmetric)
+        
+        
+        return rew_anti_symmetric
+
+    
+
     def _reward_tracking_lin_vel(self):
         # Reward tracking specified linear velocity command
         error = self.commands[:, :2] - self.base_lin_vel[:, :2]
@@ -185,9 +276,10 @@ class Humanoid(LeggedRobot):
             (self.dof_pos[:, 1] - self.dof_pos[:, 6])
             / self.cfg.normalization.obs_scales.dof_pos)
         # Pitch joint symmetry
-        error += self.sqrdexp(
-            (self.dof_pos[:, 2]-0.625 + self.dof_pos[:, 7]-0.625)
-            / self.cfg.normalization.obs_scales.dof_pos)
+        # error += self.sqrdexp(
+        #     #(self.dof_pos[:, 2]-0.625 + self.dof_pos[:, 7]-0.625)
+        #     (self.dof_vel[:, 2] + self.dof_vel[:, 7])
+        #     / self.cfg.normalization.obs_scales.dof_pos)
         return error/4
 
     def _reward_ankle_regularization(self):

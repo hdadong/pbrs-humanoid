@@ -203,6 +203,8 @@ class LeggedRobot(BaseTask):
         # reset buffers
         self.ctrl_hist[env_ids] = 0.
         self.feet_air_time[env_ids] = 0.
+        self.feet_lead_time[env_ids] = 0.
+        self.feet_ahead[env_ids] = False
         self.episode_length_buf[env_ids] = 0
         self.reset_buf[env_ids] = 1
         # fill extras
@@ -691,11 +693,22 @@ class LeggedRobot(BaseTask):
                                          dtype=torch.float,
                                          device=self.device,
                                          requires_grad=False)
+        self.feet_lead_time = torch.zeros(self.num_envs,
+                                         self.feet_indices.shape[0],
+                                         dtype=torch.float,
+                                         device=self.device,
+                                         requires_grad=False)
+        self.feet_ahead = torch.zeros(self.num_envs,
+                                         self.feet_indices.shape[0],
+                                         dtype=torch.bool,
+                                         device=self.device,
+                                         requires_grad=False)
         self.last_contacts = torch.zeros(self.num_envs,
                                          len(self.feet_indices),
                                          dtype=torch.bool,
                                          device=self.device,
                                          requires_grad=False)
+        print("self.feet_air_time",self.feet_air_time.shape, self.last_contacts.shape, self.feet_indices.shape[0])
         self.base_lin_vel = quat_rotate_inverse(self.base_quat,
                                                 self.root_states[:, 7:10])
         self.base_ang_vel = quat_rotate_inverse(self.base_quat,
@@ -878,6 +891,7 @@ class LeggedRobot(BaseTask):
         self.num_bodies = len(body_names)
         # self.num_dofs = len(self.dof_names)  # ! replaced with num_dof
         feet_names = [s for s in body_names if self.cfg.asset.foot_name in s]
+        print("feet_name", feet_names)
         penalized_contact_names = []
         for name in self.cfg.asset.penalize_contacts_on:
             penalized_contact_names.extend([s for s in body_names if name in s])
@@ -916,7 +930,7 @@ class LeggedRobot(BaseTask):
         self.feet_indices = torch.zeros(len(feet_names), dtype=torch.long, device=self.device, requires_grad=False)
         for i in range(len(feet_names)):
             self.feet_indices[i] = self.gym.find_actor_rigid_body_handle(self.envs[0], self.actor_handles[0], feet_names[i])
-
+        print("self.feet_indices", self.feet_indices)
         self.penalised_contact_indices = torch.zeros(len(penalized_contact_names), dtype=torch.long, device=self.device, requires_grad=False)
         for i in range(len(penalized_contact_names)):
             self.penalised_contact_indices[i] = self.gym.find_actor_rigid_body_handle(self.envs[0], self.actor_handles[0], penalized_contact_names[i])

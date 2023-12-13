@@ -32,7 +32,16 @@ from gpugym import LEGGED_GYM_ROOT_DIR, LEGGED_GYM_ENVS_DIR
 from .base.legged_robot import LeggedRobot
 from gpugym.utils.task_registry import task_registry
 from .PBRS.humanoid import Humanoid
-from .PBRS.humanoid_config import HumanoidCfg, HumanoidCfgPPO
+from .PBRS.humanoid_config import HumanoidCfg as bruce_walk_config
+from .PBRS.humanoid_config import HumanoidCfgPPO  as bruce_walk_ppo_config
+
+from .PBRS.humanoid_config_stand import HumanoidCfg as bruce_stand_config
+from .PBRS.humanoid_config_stand import HumanoidCfgPPO  as bruce_stand_ppo_config
+
+from .PBRS.humanoid_config_mit import HumanoidCfg as mit_walk_config
+from .PBRS.humanoid_config_mit import HumanoidCfgPPO as mit_walk_ppo_config
 
 
-task_registry.register("pbrs:humanoid", Humanoid, HumanoidCfg(), HumanoidCfgPPO())
+task_registry.register("pbrs:humanoid", Humanoid, mit_walk_config(), mit_walk_ppo_config())
+task_registry.register("pbrs:humanoid_bruce", Humanoid, bruce_walk_config(), bruce_walk_ppo_config())
+task_registry.register("pbrs:humanoid_bruce_stand", Humanoid, bruce_stand_config(), bruce_stand_ppo_config())

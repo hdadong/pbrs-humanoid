@@ -30,9 +30,9 @@ class HumanoidCfg(LeggedRobotCfg):
 
         class ranges:
             # TRAINING COMMAND RANGES #
-            lin_vel_x = [0, 5.0]        # min max [m/s]
-            lin_vel_y = [-0.1, 0.1]   # min max [m/s]
-            ang_vel_yaw = [-0.0005, 0.0005]     # min max [rad/s]
+            lin_vel_x = [0, 0]        # min max [m/s]
+            lin_vel_y = [0, 0]   # min max [m/s]
+            ang_vel_yaw = [0, 0]     # min max [rad/s]
             heading = [0., 0.]
 
             # PLAY COMMAND RANGES #
@@ -124,8 +124,8 @@ class HumanoidCfg(LeggedRobotCfg):
             'hip_yaw_r': [-0.3, 0.3],
             'hip_roll_l': [-0.15, 0.25],
             'hip_roll_r': [-0.25, 0.15],
-            'hip_pitch_l': [-0.7, 0.7],
-            'hip_pitch_r': [-0.7, 0.7],
+            'hip_pitch_l': [-0.05, 0.7],
+            'hip_pitch_r': [-0.05, 0.7],
             'knee_pitch_l': [-1.0, 0.25],
             'knee_pitch_r': [-1.0, 0.25],
             'ankle_pitch_l': [-1.0, 1.0],
@@ -272,9 +272,6 @@ class HumanoidCfg(LeggedRobotCfg):
         only_positive_rewards = False
         tracking_sigma = 0.5
 
-
-
-
         class scales(LeggedRobotCfg.rewards.scales):
             # * "True" rewards * #
             action_rate = -1.e-3
@@ -310,10 +307,8 @@ class HumanoidCfg(LeggedRobotCfg):
 
             # Sweep values: [0.1, 0.5, 2.0, 5.0, 10.]
             # Default: 1.0
-            jointReg_pb = 1.0
+            jointReg_pb = 0.0
 
-            feet_air_time = 10.0
-            feat_alternate_leading = 10.0
     class normalization(LeggedRobotCfg.normalization):
         class obs_scales(LeggedRobotCfg.normalization.obs_scales):
             base_z = 1./0.6565
