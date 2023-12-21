@@ -6,3 +6,8 @@ gpugym/scripts/wandb/
 gpuGym.egg-info/
 __pycache__
 .vscode*
+resources/robots/bruce2/
+resources/robots/bruce3/
+*.png
+*.npy
+*.csv
