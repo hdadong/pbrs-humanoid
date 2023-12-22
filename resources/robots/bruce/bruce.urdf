@@ -282,12 +282,12 @@ __status__    = "Production"
       <mass
         value="0.02762647" />
       <inertia
-        ixx="2.043E-05"
+        ixx="2.043E-04"
         ixy="2.87E-06"
         ixz="-3E-08"
-        iyy="6.2E-06"
+        iyy="6.2E-05"
         iyz="-2.4E-07"
-        izz="2.588E-05" />
+        izz="2.588E-04" />
     </inertial>
     <visual>
       <origin
@@ -564,12 +564,12 @@ __status__    = "Production"
       <mass
         value="0.02748291" />
       <inertia
-        ixx="2.042E-05"
+        ixx="2.042E-04"
         ixy="2.91E-06"
         ixz="3E-08"
-        iyy="6.27E-06"
+        iyy="6.27E-05"
         iyz="2.4E-07"
-        izz="2.602E-05" />
+        izz="2.602E-04" />
     </inertial>
     <visual>
       <origin
@@ -655,7 +655,7 @@ __status__    = "Production"
   </link>
   <joint
     name="shoulder_pitch_r"
-    type="fixed">
+    type="revolute">
     <origin
       xyz="0.029216 -0.12375 0.152985"
       rpy="1.570796327 -1.570796327 0" />
@@ -713,7 +713,7 @@ __status__    = "Production"
   </link>
   <joint
     name="shoulder_roll_r"
-    type="fixed">
+    type="revolute">
     <origin
       xyz="0 0 0"
       rpy="1.570796327 -1.570796327 0" />
@@ -771,7 +771,7 @@ __status__    = "Production"
   </link>
   <joint
     name="elbow_pitch_r"
-    type="fixed">
+    type="revolute">
     <origin
       xyz="0.1146 -0.005 0.005"
       rpy="1.570796327 0 0" />
@@ -829,7 +829,7 @@ __status__    = "Production"
   </link>
   <joint
     name="shoulder_pitch_l"
-    type="fixed">
+    type="revolute">
     <origin
       xyz="0.029216 0.12375 0.152985"
       rpy="-1.570796327 1.570796327 0" />
@@ -887,7 +887,7 @@ __status__    = "Production"
   </link>
   <joint
     name="shoulder_roll_l"
-    type="fixed">
+    type="revolute">
     <origin
       xyz="0 0 0"
       rpy="1.570796327 -1.570796327 0" />
@@ -945,7 +945,7 @@ __status__    = "Production"
   </link>
   <joint
     name="elbow_pitch_l"
-    type="fixed">
+    type="revolute">
     <origin
       xyz="0.1146 0.005 0.005"
       rpy="-1.570796327 0 0" />

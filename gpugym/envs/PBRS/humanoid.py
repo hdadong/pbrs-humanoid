@@ -21,6 +21,15 @@ class Humanoid(LeggedRobot):
         self.eps = 0.2
         self.phase_freq = 1.
 
+        self.arr_base_z = []
+        self.arr_base_lin_vel = []
+        self.arr_base_ang_vel = []
+        self.arr_projected_gravity = []
+        self.arr_commands = []
+        self.arr_dof_pos = []
+        self.arr_dof_vel = []
+        self.arr_in_contact = []
+        
     def compute_observations(self):
         base_z = self.root_states[:, 2].unsqueeze(1)*self.obs_scales.base_z
         in_contact = torch.gt(
@@ -29,7 +38,7 @@ class Humanoid(LeggedRobot):
             (in_contact[:, 0].unsqueeze(1), in_contact[:, 1].unsqueeze(1)),
             dim=1)
         self.commands[:, 0:2] = torch.where(
-            torch.norm(self.commands[:, 0:2], dim=-1, keepdim=True) < 0.5,
+            torch.norm(self.commands[:, 0:2], dim=-1, keepdim=True) < 0.05,
             0., self.commands[:, 0:2].double()).float()
         self.commands[:, 2:3] = torch.where(
             torch.abs(self.commands[:, 2:3]) < 0.5,
@@ -43,13 +52,127 @@ class Humanoid(LeggedRobot):
             self.smooth_sqr_wave(self.phase),       # [1] Contact schedule
             torch.sin(2*torch.pi*self.phase),       # [1] Phase variable
             torch.cos(2*torch.pi*self.phase),       # [1] Phase variable
-            self.dof_pos,                           # [10] Joint states
-            self.dof_vel,                           # [10] Joint velocities
-            in_contact,                             # [2] Contact states
+            self.dof_pos[:,:10],                           # [10] Joint states
+            self.dof_vel[:,:10],                           # [10] Joint velocities
+            #in_contact,                             # [2] Contact states
         ), dim=-1)
+        
         if self.add_noise:
             self.obs_buf += (2*torch.rand_like(self.obs_buf) - 1) \
                 * self.noise_scale_vec
+
+        # size = 1
+        # self.arr_base_z.append(base_z.cpu().numpy().reshape(-1, size))
+        # arr = (np.array(self.arr_base_z).reshape(-1, size))
+
+        # max_value = np.amax(arr, axis=0)
+        # min_value = np.amin(arr, axis=0)
+        # mean = np.mean(arr, axis=0)
+        # # print("1每个维度的最大值：", max_value)
+        # # print("1每个维度的最小值：", min_value)
+        # # print("1average",mean )
+        # # 1每个维度的最大值： [0.73035157]
+        # # 1每个维度的最小值： [0.6092626]
+        # # 1average [0.65711594]
+
+
+        # size = 3
+        # self.arr_base_lin_vel.append(self.base_lin_vel.cpu().numpy().reshape(-1, size))
+        # arr = (np.array(self.arr_base_lin_vel).reshape(-1, size))
+
+        # max_value = np.amax(arr, axis=0)
+        # min_value = np.amin(arr, axis=0)
+        # mean = np.mean(arr, axis=0)
+        # # print("2每个维度的最大值：", max_value)
+        # # print("2每个维度的最小值：", min_value)
+        # # print("2average",mean )
+        # # 2每个维度的最大值： [0.76365685 0.10342894 0.28158206]
+        # # 2每个维度的最小值： [ 0.02216829 -0.13187891 -0.8681069 ]
+        # # 2average [ 0.54977995 -0.0020118   0.01508623]
+
+        # size = 3
+        # self.arr_base_ang_vel.append(self.base_ang_vel.cpu().numpy().reshape(-1, size))
+        # arr = (np.array(self.arr_base_ang_vel).reshape(-1, size))
+
+        # max_value = np.amax(arr, axis=0)
+        # min_value = np.amin(arr, axis=0)
+        # mean = np.mean(arr, axis=0)
+        # # print("3每个维度的最大值：", max_value)
+        # # print("3每个维度的最小值：", min_value)
+        # # print("3average",mean )
+
+        # # 3每个维度的最大值： [2.6007495  2.4441288  0.27301392]
+        # # 3每个维度的最小值： [-1.2208804  -1.2524822  -0.28879547]
+        # # 3average [-0.00135     0.00148876  0.00972671]
+
+        # size = 3
+        # self.arr_projected_gravity.append(self.projected_gravity.cpu().numpy().reshape(-1, size))
+        # arr = (np.array(self.arr_projected_gravity).reshape(-1, size))
+
+        # max_value = np.amax(arr, axis=0)
+        # min_value = np.amin(arr, axis=0)
+        # mean = np.mean(arr, axis=0)
+        # # print("4每个维度的最大值：", max_value)
+        # # print("4每个维度的最小值：", min_value)
+        # # print("4average",mean )
+        # # 4每个维度的最大值： [ 0.15107535  0.06497588 -0.9831163 ]
+        # # 4每个维度的最小值： [-0.04737015 -0.13590603 -0.99999744]
+        # # 4average [ 2.8091200e-02  1.2523543e-04 -9.9900317e-01]
+
+        # size = 10
+        # self.arr_dof_pos.append(self.dof_pos.cpu().numpy().reshape(-1, size))
+        # arr = (np.array(self.arr_dof_pos).reshape(-1, size))
+
+        # max_value = np.amax(arr, axis=0)
+        # min_value = np.amin(arr, axis=0)
+        # mean = np.mean(arr, axis=0)
+        # # print("5每个维度的最大值：", max_value)
+        # # print("5每个维度的最小值：", min_value)
+        # # print("5average",mean )
+
+        # # 5每个维度的最大值： [ 0.0226062  -0.0078077   0.68676454 -0.5609987   0.8665639   0.2588648
+        # # 0.109882    0.9526095  -0.59015733  0.7152511 ]
+        # # 5每个维度的最小值： [-0.2531666  -0.29012758  0.09050219 -1.3497385  -0.85000044 -0.11983494
+        # # -0.24662128  0.07996913 -1.4112294  -0.3573461 ]
+        # # 5average [-0.0566077  -0.08981413  0.39391476 -0.93706566  0.37414712  0.06283388
+        # # -0.05665085  0.49709874 -0.93742204  0.31602097]
+
+
+        # size = 10
+        # self.arr_dof_vel.append(self.dof_vel.cpu().numpy().reshape(-1, size))
+        # arr = (np.array(self.arr_dof_vel).reshape(-1, size))
+
+        # max_value = np.amax(arr, axis=0)
+        # min_value = np.amin(arr, axis=0)
+        # mean = np.mean(arr, axis=0)
+        # # print("6每个维度的最大值：", max_value)
+        # # print("6每个维度的最小值：", min_value)
+        # # print("6average",mean )
+        # # 6每个维度的最大值： [  2.2389023   1.9323001   8.887673   21.286253   93.59549     5.533604
+        # # 2.7259107   7.9249215  23.320297  200.30435  ]
+        # # 6每个维度的最小值： [  -2.9892066   -2.9781268   -4.1857357  -19.082626  -126.936134
+        # # -3.7456295  -10.491483    -7.3315463   -9.696518   -62.025955 ]
+        # # 6average [ 3.4315798e-02 -6.8051770e-04  1.0335441e-02 -5.4480370e-02
+        # # -6.0612749e-02 -2.4891451e-02 -3.2053574e-03  1.8579228e-02
+        # # -1.3696532e-01  8.5475558e-01]
+
+        # size = 2
+        # self.arr_in_contact.append(in_contact.cpu().numpy().reshape(-1, size))
+        # arr = (np.array(self.arr_in_contact).reshape(-1, size))
+        
+        # max_value = np.amax(arr, axis=0)
+        # min_value = np.amin(arr, axis=0)
+        # mean = np.mean(arr, axis=0)
+        # # print("7每个维度的最大值：", max_value)
+        # # print("7每个维度的最小值：", min_value)
+        # # print("7average",mean )
+        # # 每个维度的最大值： [1 1]
+        # # 每个维度的最小值： [0 0]
+        # # average [0.75708763 0.67469394]
+
+        
+
+
 
     def _get_noise_scale_vec(self, cfg):
         noise_vec = torch.zeros_like(self.obs_buf[0])
@@ -60,10 +183,19 @@ class Humanoid(LeggedRobot):
         noise_vec[1:4] = noise_scales.lin_vel
         noise_vec[4:7] = noise_scales.ang_vel
         noise_vec[7:10] = noise_scales.gravity
-        noise_vec[10:16] = 0.   # commands
+
+        noise_vec[10:13] = 0.   # commands
+        noise_vec[13:16] = 0.   # time
+
+        # noise_vec[1:4] = noise_scales.lin_vel
+        # noise_vec[4:7] = noise_scales.ang_vel
+        # noise_vec[7:10] = noise_scales.gravity
+        # noise_vec[10:16] = 0.   # commands
         noise_vec[16:26] = noise_scales.dof_pos
         noise_vec[26:36] = noise_scales.dof_vel
-        noise_vec[36:38] = noise_scales.in_contact  # previous actions
+        # noise_vec[13:23] = noise_scales.dof_pos
+        # noise_vec[23:33] = noise_scales.dof_vel
+        #noise_vec[36:38] = noise_scales.in_contact  # previous actions
         if self.cfg.terrain.measure_heights:
             noise_vec[48:235] = noise_scales.height_measurements \
                 * noise_level \
@@ -126,7 +258,8 @@ class Humanoid(LeggedRobot):
         self.reset_buf |= torch.any(
            torch.abs(self.projected_gravity[:, 1:2]) > 0.7, dim=1)
         #print("5 torch.abs(self.projected_gravity[:, 1:2])", torch.any(torch.abs(self.projected_gravity[:, 1:2]) > 0.7, dim=1))
-        self.reset_buf |= torch.any(self.base_pos[:, 2:3] < 0.3, dim=1)
+        self.reset_buf |= torch.any(self.base_pos[:, 2:3] < 0.2, dim=1)
+        self.reset_buf |= torch.any(self.base_pos[:, 2:3] > 0.65, dim=1)
         #print("6 self.base_pos[:, 2:3]",torch.any(self.base_pos[:, 2:3] < 0.3, dim=1)    )
         # # no terminal reward for time-outs
         self.time_out_buf = self.episode_length_buf > self.max_episode_length
@@ -172,8 +305,12 @@ class Humanoid(LeggedRobot):
         
 
         # Calculate reward for anti-symmetric steps
-        rew_anti_symmetric = self.feet_lead_time[:,1]  * left_over_right * (torch.norm(self.commands[:, :2], dim=1) > 0.1)
-        rew_anti_symmetric += self.feet_lead_time[:,0]  * right_over_left * (torch.norm(self.commands[:, :2], dim=1) > 0.1)
+        rew_anti_symmetric = self.feet_lead_time[:,1]  * left_over_right * (torch.norm(self.commands[:, :2], dim=1) > 0.05)
+        rew_anti_symmetric += self.feet_lead_time[:,0]  * right_over_left * (torch.norm(self.commands[:, :2], dim=1) > 0.05)
+
+
+        #print("self.feet_lead_time", self.feet_lead_time[:,0], self.feet_lead_time[:,1], rew_anti_symmetric)
+
         
         # for leading, the time is added to dt. for updating, the time is set to zero.
         self.feet_lead_time += self.dt
@@ -184,12 +321,6 @@ class Humanoid(LeggedRobot):
         # Combine the rewards
         total_reward = rew_anti_symmetric
 
-        
-        
-        
-        
-        
-        
         return total_reward
 
 
@@ -209,7 +340,7 @@ class Humanoid(LeggedRobot):
 
         # Calculate reward for anti-symmetric steps
         rew_anti_symmetric = torch.sum(self.feet_air_time * first_contact * anti_symmetric_pattern.unsqueeze(1).repeat(1,2), dim=1)
-        rew_anti_symmetric *= torch.norm(self.commands[:, :2], dim=1) > 0.1  # No reward for zero command
+        rew_anti_symmetric *= torch.norm(self.commands[:, :2], dim=1) > 0.05  # No reward for zero command
 
         self.feet_air_time *= ~contact_filt
         
@@ -252,6 +383,46 @@ class Humanoid(LeggedRobot):
         dof_vel_scaled = self.dof_vel/self.cfg.normalization.obs_scales.dof_vel
         return torch.sum(self.sqrdexp(dof_vel_scaled), dim=-1)
 
+    def _reward_joint_regularization_stand(self):
+        # Reward joint poses and symmetry
+        error = 0.
+        # Yaw joints regularization around 0
+        error += self.sqrdexp(
+            (self.dof_pos[:, 0]) / self.cfg.normalization.obs_scales.dof_pos)
+        error += self.sqrdexp(
+            (self.dof_pos[:, 5]) / self.cfg.normalization.obs_scales.dof_pos)
+        # Ab/ad joint symmetry
+        
+        error += self.sqrdexp(
+            (self.dof_pos[:, 1] - self.dof_pos[:, 6])
+            / self.cfg.normalization.obs_scales.dof_pos)
+        
+
+        error += self.sqrdexp(
+            (self.dof_pos[:, 1]) / self.cfg.normalization.obs_scales.dof_pos)
+        error += self.sqrdexp(
+            (self.dof_pos[:, 6]) / self.cfg.normalization.obs_scales.dof_pos)
+        
+        
+        error += self.sqrdexp(
+            (self.dof_pos[:, 4]) / self.cfg.normalization.obs_scales.dof_pos)
+        error += self.sqrdexp(
+            (self.dof_pos[:, 9]) / self.cfg.normalization.obs_scales.dof_pos)
+        
+        # error += self.sqrdexp(
+        #     (self.dof_pos[:, 2]) / self.cfg.normalization.obs_scales.dof_pos)
+        # error += self.sqrdexp(
+        #     (self.dof_pos[:, 7]) / self.cfg.normalization.obs_scales.dof_pos)
+        
+        
+        # Pitch joint symmetry
+        # error += self.sqrdexp(
+        #     #(self.dof_pos[:, 2]-0.625 + self.dof_pos[:, 7]-0.625)
+        #     (self.dof_vel[:, 2] + self.dof_vel[:, 7])
+        #     / self.cfg.normalization.obs_scales.dof_pos)
+        return error/7
+    
+    
     def _reward_joint_regularization(self):
         # Reward joint poses and symmetry
         error = 0.
@@ -265,6 +436,13 @@ class Humanoid(LeggedRobot):
         error += self.sqrdexp(
             (self.dof_pos[:, 1] - self.dof_pos[:, 6])
             / self.cfg.normalization.obs_scales.dof_pos)
+        
+        
+        # error += self.sqrdexp(
+        #     (self.dof_pos[:, 4]) / self.cfg.normalization.obs_scales.dof_pos)
+        # error += self.sqrdexp(
+        #     (self.dof_pos[:, 9]) / self.cfg.normalization.obs_scales.dof_pos)
+        
         # Pitch joint symmetry
         # error += self.sqrdexp(
         #     #(self.dof_pos[:, 2]-0.625 + self.dof_pos[:, 7]-0.625)
@@ -287,6 +465,7 @@ class Humanoid(LeggedRobot):
         self.rwd_oriPrev = self._reward_orientation()
         self.rwd_baseHeightPrev = self._reward_base_height()
         self.rwd_jointRegPrev = self._reward_joint_regularization()
+        self.rwd_jointRegPrev_stand = self._reward_joint_regularization_stand()
 
     def _reward_ori_pb(self):
         delta_phi = ~self.reset_buf \
@@ -298,6 +477,11 @@ class Humanoid(LeggedRobot):
             * (self._reward_joint_regularization() - self.rwd_jointRegPrev)
         return delta_phi / self.dt_step
 
+    def _reward_jointReg_pb_stand(self):
+        delta_phi = ~self.reset_buf \
+            * (self._reward_joint_regularization_stand() - self.rwd_jointRegPrev_stand)
+        return delta_phi / self.dt_step
+    
     def _reward_baseHeight_pb(self):
         delta_phi = ~self.reset_buf \
             * (self._reward_base_height() - self.rwd_baseHeightPrev)
