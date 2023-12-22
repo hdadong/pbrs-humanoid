@@ -84,7 +84,7 @@ handler = gym.create_actor(env, asset, pose, None, -1, 1)
 
 
 
-cam_pos = gymapi.Vec3(2, 1, 2)
+cam_pos = gymapi.Vec3(1.5, 0.5, 2)
 cam_target = gymapi.Vec3(-10, -2.5, -13)
 gym.viewer_camera_look_at(viewer, None, cam_pos, cam_target)
 
