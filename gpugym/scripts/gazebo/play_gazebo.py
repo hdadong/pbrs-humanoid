@@ -43,13 +43,17 @@ task_registry = TaskRegistry()
 
 task_registry.register("pbrs:humanoid_bruce", SimpleTask, HumanoidCfg(), HumanoidCfgPPO())
 
+task_registry.register("pbrs:humanoid_bruce_stand", SimpleTask, HumanoidCfg(), HumanoidCfgPPO())
 
 
+import time
 def play(args):
+
+    
     env_cfg, train_cfg = task_registry.get_cfgs(name=args.task)
     # prepare environment
     env = SimpleTask(env_cfg)
-    obs = env.get_observations()
+    obs = env.get_observations() # TODO
 
     # load policy
     train_cfg.runner.resume = True
@@ -72,15 +76,18 @@ def play(args):
 
     
     
-    for i in range(1000000000):        
+    for i in range(1000000000): 
+        #start = time.time()       
         actions = policy(obs.detach())
-        obs  = env.step(actions.detach())
-        print("action", i, actions)
+        #print(actions)
+        #actions = torch.tensor(1)
+        obs  = env.step(actions.detach(), obs)
+        #print("action", i, actions)
         
 
 
 
-# python gpugym/scripts/play_gazebo.py --task=pbrs:humanoid_bruce --headless
+# python gpugym/scripts/gazebo/play_gazebo.py --task=pbrs:humanoid_bruce
 if __name__ == '__main__':
     EXPORT_POLICY = True
     EXPORT_CRITIC = True
