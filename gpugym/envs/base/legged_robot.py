@@ -392,13 +392,13 @@ class LeggedRobot(BaseTask):
             rng = self.cfg.domain_rand.scale_inertia_range
             for i in range(len(props)):
                 props[i].inertia.x.x *= np.random.uniform(rng[0], rng[1])
-                props[i].inertia.x.y *= np.random.uniform(rng[0], rng[1])
-                props[i].inertia.x.z *= np.random.uniform(rng[0], rng[1])
-                props[i].inertia.y.x *= np.random.uniform(rng[0], rng[1])
+                #props[i].inertia.x.y *= np.random.uniform(rng[0], rng[1])
+                #props[i].inertia.x.z *= np.random.uniform(rng[0], rng[1])
+                #rops[i].inertia.y.x *= np.random.uniform(rng[0], rng[1])
                 props[i].inertia.y.y *= np.random.uniform(rng[0], rng[1])
-                props[i].inertia.y.z *= np.random.uniform(rng[0], rng[1])
-                props[i].inertia.z.x *= np.random.uniform(rng[0], rng[1])
-                props[i].inertia.z.y *= np.random.uniform(rng[0], rng[1])
+                #props[i].inertia.y.z *= np.random.uniform(rng[0], rng[1])
+                #props[i].inertia.z.x *= np.random.uniform(rng[0], rng[1])
+                #props[i].inertia.z.y *= np.random.uniform(rng[0], rng[1])
                 props[i].inertia.z.z *= np.random.uniform(rng[0], rng[1])
         if self.cfg.domain_rand.randomize_all_link_com:
             rng = self.cfg.domain_rand.scale_com_range
@@ -1136,15 +1136,15 @@ class LeggedRobot(BaseTask):
         asset_options.thickness = self.cfg.asset.thickness
         asset_options.disable_gravity = self.cfg.asset.disable_gravity
 
-        robot_asset = self.gym.load_asset(self.sim, asset_root, asset_file, asset_options)
-        self.num_dof = self.gym.get_asset_dof_count(robot_asset)
-        self.num_bodies = self.gym.get_asset_rigid_body_count(robot_asset)
-        dof_props_asset = self.gym.get_asset_dof_properties(robot_asset)
-        rigid_shape_props_asset = self.gym.get_asset_rigid_shape_properties(robot_asset)
-        print("rigid_shape_props_asset", rigid_shape_props_asset)
+        self.robot_asset = self.gym.load_asset(self.sim, asset_root, asset_file, asset_options)
+        self.num_dof = self.gym.get_asset_dof_count(self.robot_asset)
+        self.num_bodies = self.gym.get_asset_rigid_body_count(self.robot_asset)
+        self.dof_props_asset = self.gym.get_asset_dof_properties(self.robot_asset)
+        self.rigid_shape_props_asset = self.gym.get_asset_rigid_shape_properties(self.robot_asset)
+        print("rigid_shape_props_asset", self.rigid_shape_props_asset)
         # save body names from the asset
-        body_names = self.gym.get_asset_rigid_body_names(robot_asset)
-        self.dof_names = self.gym.get_asset_dof_names(robot_asset)
+        body_names = self.gym.get_asset_rigid_body_names(self.robot_asset)
+        self.dof_names = self.gym.get_asset_dof_names(self.robot_asset)
         print("self.dof_names", self.dof_names)
         self.num_bodies = len(body_names)
         # self.num_dofs = len(self.dof_names)  # ! replaced with num_dof
@@ -1174,10 +1174,10 @@ class LeggedRobot(BaseTask):
             pos[:2] += torch_rand_float(-1., 1., (2,1), device=self.device).squeeze(1)
             start_pose.p = gymapi.Vec3(*pos)
 
-            rigid_shape_props = self._process_rigid_shape_props(rigid_shape_props_asset, i)
-            self.gym.set_asset_rigid_shape_properties(robot_asset, rigid_shape_props)
-            legged_robot_handle = self.gym.create_actor(env_handle, robot_asset, start_pose, "legged_robot", i, self.cfg.asset.self_collisions, 0)
-            dof_props = self._process_dof_props(dof_props_asset, i)
+            rigid_shape_props = self._process_rigid_shape_props(self.rigid_shape_props_asset, i)
+            self.gym.set_asset_rigid_shape_properties(self.robot_asset, rigid_shape_props)
+            legged_robot_handle = self.gym.create_actor(env_handle, self.robot_asset, start_pose, "legged_robot", i, self.cfg.asset.self_collisions, 0)
+            dof_props = self._process_dof_props(self.dof_props_asset, i)
             self.gym.set_actor_dof_properties(env_handle, legged_robot_handle, dof_props)
             body_props = self.gym.get_actor_rigid_body_properties(env_handle, legged_robot_handle)
             body_props = self._process_rigid_body_props(body_props, i)

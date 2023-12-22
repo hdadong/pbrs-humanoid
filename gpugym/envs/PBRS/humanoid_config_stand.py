@@ -373,8 +373,8 @@ class HumanoidCfg(LeggedRobotCfg):
         decimation = 10
 
     class domain_rand(LeggedRobotCfg.domain_rand):
-        randomize_friction = False
-        friction_range = [0.5, 2.0]
+        randomize_friction = True
+        friction_range = [0.05, 1.25]
 
         randomize_base_mass = False
         added_mass_range = [-0.1, 0.1]
@@ -383,7 +383,7 @@ class HumanoidCfg(LeggedRobotCfg):
         randomize_all_link_mass = False
         scale_mass_range =  [0.5, 1.5]
         
-        randomize_all_link_inertia = False
+        randomize_all_link_inertia = True
         scale_inertia_range = [0.7, 1.3]
         
         randomize_all_link_com = False
@@ -391,8 +391,8 @@ class HumanoidCfg(LeggedRobotCfg):
 
         
         push_robots = True
-        push_interval_s = 2.5
-        max_push_vel_xy = 0.05
+        push_interval_s = 15
+        max_push_vel_xy = 0.5
 
 
         randomize_kpkd = True
