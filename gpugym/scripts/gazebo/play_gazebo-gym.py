@@ -148,9 +148,11 @@ def play(args):
         # zero_action[0][8] = -0.2
         # zero_action[0][9] = 0.1
         obs_gym, _, rews, dones, infos   = env_gym.step(actions_gym.detach())
-        obs_gazebo  = env_gazebo.step(actions_gazebo.detach(), obs_gym)
-
-        
+        if (i>100): 
+            obs_gazebo  = env_gazebo.step(actions_gazebo.detach(), obs_gym)
+        else:  
+            env_gazebo.gs.simulator.step_simulation()
+            
         if RECORD_FRAMES:
             if i % 2:
                 filename = os.path.join(LEGGED_GYM_ROOT_DIR, 'logs', train_cfg.runner.experiment_name, 'exported', 'frames', f"{img_idx}.png")
