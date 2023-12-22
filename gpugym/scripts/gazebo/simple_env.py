@@ -87,7 +87,7 @@ class GazeboSimulator:
         # self.leg_d_gains = [ 1., 2.3, 0.8, 0.8, 0.003]
         self.leg_p_gains = [265, 150,  80,  80,    300]
         self.leg_i_gains = [  0,   0,   0,   0,     0]
-        self.leg_d_gains = [ 1., 2.3, 0.8,  1.0, 0.03]
+        self.leg_d_gains = [ 1., 2.3, 0.8,  1.0, 0.00]
         
         # self.leg_p_gains = [35, 35,  35,  35,    0.2]
         # self.leg_i_gains = [  0,   0,   0,   0,     0]
