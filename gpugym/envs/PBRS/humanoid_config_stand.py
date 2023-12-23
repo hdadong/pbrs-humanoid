@@ -374,7 +374,7 @@ class HumanoidCfg(LeggedRobotCfg):
 
     class domain_rand(LeggedRobotCfg.domain_rand):
         randomize_friction = True
-        friction_range = [0.05, 1.25]
+        friction_range = [0.00, 1.25]
 
         randomize_base_mass = False
         added_mass_range = [-0.1, 0.1]
@@ -384,7 +384,7 @@ class HumanoidCfg(LeggedRobotCfg):
         scale_mass_range =  [0.5, 1.5]
         
         randomize_all_link_inertia = True
-        scale_inertia_range = [0.7, 1.3]
+        scale_inertia_range = [0.4, 1.6]
         
         randomize_all_link_com = False
         scale_com_range = [-0.05, 0.05]
@@ -496,7 +496,7 @@ class HumanoidCfg(LeggedRobotCfg):
             # Sweep values: [0.1, 0.5, 2.0, 5.0, 10.]
             # Default: 1.0
             jointReg_pb = 0.0
-            jointReg_pb_stand = 1.0
+            jointReg_pb_stand = 10.0
 
     class normalization(LeggedRobotCfg.normalization):
         class obs_scales(LeggedRobotCfg.normalization.obs_scales):
