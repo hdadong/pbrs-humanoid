@@ -68,6 +68,7 @@ class LeggedRobot(BaseTask):
         self.height_samples = None
         self.debug_viz = False
         self.init_done = False
+        self.randomize = True
         self._parse_cfg(self.cfg)
         super().__init__(self.cfg, sim_params, physics_engine, sim_device, headless)
 
@@ -159,7 +160,7 @@ class LeggedRobot(BaseTask):
 
         self.episode_length_buf += 1
         self.common_step_counter += 1
-
+        self.randomize_buf += 1
         # prepare quantities
         self.base_quat[:] = self.root_states[:, 3:7]
         self.base_lin_vel[:] = quat_rotate_inverse(self.base_quat, self.root_states[:, 7:10])
@@ -204,6 +205,9 @@ class LeggedRobot(BaseTask):
         """
         if len(env_ids) == 0:
             return
+
+        if self.randomize:
+            self.apply_randomizations(self.randomization_params)
 
         # update curriculum
         if self.cfg.terrain.curriculum:
@@ -303,6 +307,9 @@ class LeggedRobot(BaseTask):
             raise ValueError("Terrain mesh type not recognised. Allowed types are [None, plane, heightfield, trimesh]")
         self._create_envs()
 
+        # If randomizing, apply once immediately on startup before the fist sim step
+        if self.randomize:
+            self.apply_randomizations(self.randomization_params)
 
     def set_camera(self, position, lookat):
         """ Set camera position and direction
@@ -1252,6 +1259,7 @@ class LeggedRobot(BaseTask):
 
         self.cfg.domain_rand.push_interval = np.ceil(self.cfg.domain_rand.push_interval_s / self.dt)
 
+        self.randomization_params = class_to_dict(self.cfg.domain_rand_new)
 
     def _draw_debug_vis(self):
         """ Draws visualizations for dubugging (slows down simulation a lot).

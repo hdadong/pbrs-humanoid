@@ -43,6 +43,7 @@ class VecEnv(ABC):
     obs_buf: torch.Tensor 
     rew_buf: torch.Tensor
     reset_buf: torch.Tensor
+    randomize_buf = torch.Tensor
     episode_length_buf: torch.Tensor # current episode duration
     extras: dict
     device: torch.device

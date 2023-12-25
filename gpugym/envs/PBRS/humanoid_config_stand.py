@@ -371,19 +371,85 @@ class HumanoidCfg(LeggedRobotCfg):
         action_scale = 1.0
         exp_avg_decay = None
         decimation = 10
+        
+    class domain_rand_new:
+        # specify which attributes to randomize for each actor type and property
+        frequency = 300   # Define how many environment steps between generating new randomizations
+        # observations = {
+        #     'range': [0, .002], # range for the white noise
+        #     'operation': "additive",
+        #     'distribution': "gaussian",
+        # }
+        # actions = {
+        #     'range': [0., .02],
+        #     'operation': "additive",
+        #     'distribution': "gaussian",
+        # }
+        sim_params = {
+            'gravity':  {
+                'range': [0, 0.4],
+                'operation': "additive",
+                'distribution': "gaussian",
+                'schedule': "linear",
+                'schedule_steps': 3000
+            }
+            
+        }
+        
+        actor_params = {
+                'legged_robot':{
+                    'color': True,
+                    # 'rigid_body_properties':{
+                    #     'mass':{ 
+                    #         'range': [0.5, 1.5],
+                    #         'operation': "scaling",
+                    #         'distribution': "uniform",
+                    #         'setup_only': True ,# Property will only be randomized once before simulation is started. See Domain Randomization Documentation for more info.
+                    #         'schedule': "linear",  # "linear" will linearly interpolate between no rand and max rand
+                    #         'schedule_steps': 3000,
+                    #     },
+                    #     'inertia':{ 
+                    #         'range': [0.5, 1.5],
+                    #         'operation': "scaling",
+                    #         'distribution': "uniform",
+                    #         'setup_only': True ,# Property will only be randomized once before simulation is started. See Domain Randomization Documentation for more info.
+                    #         'schedule': "linear",  # "linear" will linearly interpolate between no rand and max rand
+                    #         'schedule_steps': 3000,
+                    #     }
+                    # },
+                    'rigid_shape_properties': {
+                        'friction':{
+                            'num_buckets': 250,
+                            'range': [0.0, 1.25],
+                            'operation': "scaling",
+                            'distribution': "uniform",
+                            'schedule': "linear",  # "linear" will scale the current random sample by `min(current num steps, schedule_steps) / schedule_steps`
+                            'schedule_steps': 3000,
+                        },
+                        'restitution':{
+                            'range': [0., 0.4],
+                            'operation': "scaling",
+                            'distribution': "uniform",
+                            'schedule': "linear",  # "linear" will scale the current random sample by `min(current num steps, schedule_steps) / schedule_steps`
+                            'schedule_steps': 3000,
+                        }
+                    }
+                }
+            }
+
 
     class domain_rand(LeggedRobotCfg.domain_rand):
-        randomize_friction = True
+        randomize_friction = False
         friction_range = [0.00, 1.25]
 
         randomize_base_mass = False
-        added_mass_range = [-0.1, 0.1]
+        added_mass_range = [-0.05, 0.05]
 
 
         randomize_all_link_mass = False
         scale_mass_range =  [0.5, 1.5]
         
-        randomize_all_link_inertia = True
+        randomize_all_link_inertia = False
         scale_inertia_range = [0.4, 1.6]
         
         randomize_all_link_com = False
@@ -451,7 +517,7 @@ class HumanoidCfg(LeggedRobotCfg):
     class rewards(LeggedRobotCfg.rewards):
         # ! "Incorrect" specification of height
         # base_height_target = 0.7
-        base_height_target = 0.48
+        base_height_target = 0.46
         soft_dof_pos_limit = 0.9
         soft_dof_vel_limit = 0.9
         soft_torque_limit = 0.8
@@ -512,9 +578,9 @@ class HumanoidCfg(LeggedRobotCfg):
         class noise_scales(LeggedRobotCfg.noise.noise_scales):
             base_z = 0.05
             dof_pos = 0.005
-            dof_vel = 0.001
-            lin_vel = 0.00001
-            ang_vel = 0.00005
+            dof_vel = 0.01
+            lin_vel = 0.01
+            ang_vel = 0.05
             gravity = 0.05
             in_contact = 0.1
             height_measurements = 0.1
