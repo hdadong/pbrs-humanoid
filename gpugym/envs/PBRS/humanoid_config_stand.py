@@ -399,24 +399,24 @@ class HumanoidCfg(LeggedRobotCfg):
         actor_params = {
                 'legged_robot':{
                     'color': True,
-                    # 'rigid_body_properties':{
-                    #     'mass':{ 
-                    #         'range': [0.5, 1.5],
-                    #         'operation': "scaling",
-                    #         'distribution': "uniform",
-                    #         'setup_only': True ,# Property will only be randomized once before simulation is started. See Domain Randomization Documentation for more info.
-                    #         'schedule': "linear",  # "linear" will linearly interpolate between no rand and max rand
-                    #         'schedule_steps': 3000,
-                    #     },
-                    #     'inertia':{ 
-                    #         'range': [0.5, 1.5],
-                    #         'operation': "scaling",
-                    #         'distribution': "uniform",
-                    #         'setup_only': True ,# Property will only be randomized once before simulation is started. See Domain Randomization Documentation for more info.
-                    #         'schedule': "linear",  # "linear" will linearly interpolate between no rand and max rand
-                    #         'schedule_steps': 3000,
-                    #     }
-                    # },
+                    'rigid_body_properties':{
+                    #     # 'mass':{ 
+                    #     #     'range': [0.5, 1.5],
+                    #     #     'operation': "scaling",
+                    #     #     'distribution': "uniform",
+                    #     #     'setup_only': True ,# Property will only be randomized once before simulation is started. See Domain Randomization Documentation for more info.
+                    #     #     'schedule': "linear",  # "linear" will linearly interpolate between no rand and max rand
+                    #     #     'schedule_steps': 3000,
+                    #     # },
+                        'inertia':{ 
+                            'range': [0.5, 1.5],
+                            'operation': "scaling",
+                            'distribution': "uniform",
+                            'setup_only': True ,# Property will only be randomized once before simulation is started. See Domain Randomization Documentation for more info.
+                            'schedule': "linear",  # "linear" will linearly interpolate between no rand and max rand
+                            'schedule_steps': 3000,
+                        }
+                    },
                     'rigid_shape_properties': {
                         'friction':{
                             'num_buckets': 250,

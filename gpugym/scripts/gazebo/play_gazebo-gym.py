@@ -103,7 +103,7 @@ def play(args):
     img_idx = 0
 
     play_log = []
-    env_gym.max_episode_length = 1000./env_gym.dt
+    env_gym.max_episode_length = 50
     
     
     phase = torch.zeros(
@@ -194,6 +194,10 @@ def play(args):
 #  python gpugym/scripts/gazebo/play_gazebo-gym.py --task=pbrs:humanoid_bruce_stand
 #  python gpugym/scripts/gazebo/play_gazebo-gym.py --task=pbrs:humanoid_bruce_stand --load_run Dec22_09-08-23_ICRA2023 --checkpoint 2000
 # python gpugym/scripts/gazebo/play_gazebo-gym.py --task=pbrs:humanoid_bruce_stand --load_run Dec21_23-28-54_ICRA2023 
+
+# python gpugym/scripts/gazebo/play_gazebo-gym.py --task=pbrs:humanoid_bruce_stand --load_run   Dec25_22-38-35_ICRA2023 --checkpoint 42550 42400-42550 good
+
+#Loading model from: /home/bigeast/pbrs-humanoid/logs/PBRS_HumanoidLocomotion/Dec25_22-38-35_ICRA2023/model_42400.pt
 if __name__ == '__main__':
     EXPORT_POLICY = True
     EXPORT_CRITIC = True
