@@ -175,16 +175,16 @@ class HumanoidCfg(LeggedRobotCfg):
         # }
 
         dof_pos_range = {
-            'hip_yaw_l': [-0.3, 0.3],
-            'hip_yaw_r': [-0.3, 0.3],
-            'hip_roll_l': [-0.15, 0.25],
-            'hip_roll_r': [-0.25, 0.15],
-            'hip_pitch_l': [-0.05, 0.7],
-            'hip_pitch_r': [-0.05, 0.7],
-            'knee_pitch_l': [-1.0, 0.25],
-            'knee_pitch_r': [-1.0, 0.25],
-            'ankle_pitch_l': [-1.0, 1.0],
-            'ankle_pitch_r': [-1.0, 1.0],
+            'hip_yaw_l': [-1.57+PI_2-0.05, -1.57+PI_2+0.05],
+            'hip_yaw_r': [-1.57+PI_2-0.05, -1.57+PI_2+0.05],
+            'hip_roll_l':  [-1.57+PI_2-0.05, -1.57+PI_2+0.05],
+            'hip_roll_r':  [-1.57+PI_2-0.05, -1.57+PI_2+0.05],
+            'hip_pitch_l': [0.59-0.05, 0.59+0.05],
+            'hip_pitch_r': [0.59-0.05, 0.59+0.05],
+            'knee_pitch_l': [-1.0-0.1, -1.0+0.1],
+            'knee_pitch_r': [-1.0-0.1, -1.0+0.1],
+            'ankle_pitch_l': [0.35-0.1, 0.35+0.1],
+            'ankle_pitch_r': [0.35-0.1, 0.35+0.1],
             'shoulder_pitch_l':[0.7, 0.7],
             'shoulder_roll_l':[-1.3, -1.3],
             'elbow_pitch_l':[-2.0, -2.0],
@@ -458,7 +458,7 @@ class HumanoidCfg(LeggedRobotCfg):
         
         push_robots = True
         push_interval_s = 15
-        max_push_vel_xy = 0.5
+        max_push_vel_xy = 0.05
 
 
         randomize_kpkd = True
@@ -564,6 +564,7 @@ class HumanoidCfg(LeggedRobotCfg):
             jointReg_pb = 0.0
             jointReg_pb_stand = 10.0
 
+            jointReg_pb_foot_penalty = 1.0
     class normalization(LeggedRobotCfg.normalization):
         class obs_scales(LeggedRobotCfg.normalization.obs_scales):
             base_z = 1.

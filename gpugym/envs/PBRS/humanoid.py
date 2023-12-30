@@ -373,6 +373,42 @@ class Humanoid(LeggedRobot):
         error = error.flatten()
         return torch.exp(-torch.square(error)/self.cfg.rewards.tracking_sigma)
 
+    def _reward_foot_penalty(self):
+        # left foot rotation
+        error_left_rot = torch.sum(torch.square(self.rigid_body_rot[:, 5, :3]), dim=1)
+        error_left_rot = torch.exp(-error_left_rot/self.cfg.rewards.tracking_sigma)
+        # right foot rotation
+        error_right_rot = torch.sum(torch.square(self.rigid_body_rot[:, 10, :3]), dim=1)
+        error_right_rot = torch.exp(-error_right_rot/self.cfg.rewards.tracking_sigma)
+        
+        # left foot velocity
+        error_left_vel = torch.sum(torch.square(self.rigid_body_vel[:, 5, :3]), dim=1)
+        error_left_vel = torch.exp(-error_left_vel/self.cfg.rewards.tracking_sigma)
+        
+        # right foot velocity
+        error_right_vel = torch.sum(torch.square(self.rigid_body_vel[:, 10, :3]), dim=1)
+        error_right_vel = torch.exp(-error_right_vel/self.cfg.rewards.tracking_sigma)
+        
+        # foot z position
+        error_left_z = self.sqrdexp(self.rigid_body_pos[:, 5, 2])
+        error_right_z = self.sqrdexp(self.rigid_body_pos[:, 10, 2])
+
+        # # foot motor vel
+        # error_left_motor_vel = self.sqrdexp(self.dof_vel[:, 4]) 
+        # error_right_motor_vel = self.sqrdexp(self.dof_vel[:, 9])
+        
+        # error_left_knee_motor_vel = self.sqrdexp(self.dof_vel[:, 3]) 
+        # error_right_knee_motor_vel = self.sqrdexp(self.dof_vel[:, 8])
+        
+        
+        error = error_left_rot + error_right_rot \
+            + error_left_vel + error_right_vel \
+            +error_left_z + error_right_z\
+            #+ error_left_motor_vel + error_right_motor_vel\
+            #+ error_left_knee_motor_vel + error_right_knee_motor_vel
+        error = error / 6
+        return error
+
     def _reward_orientation(self):
         # Reward tracking upright orientation
         error = torch.sum(torch.square(self.projected_gravity[:, :2]), dim=1)
@@ -394,7 +430,7 @@ class Humanoid(LeggedRobot):
         # Ab/ad joint symmetry
         
         error += self.sqrdexp(
-            (self.dof_pos[:, 1] - self.dof_pos[:, 6])
+            (self.dof_pos[:, 1] + self.dof_pos[:, 6])
             / self.cfg.normalization.obs_scales.dof_pos)
         
 
@@ -404,10 +440,10 @@ class Humanoid(LeggedRobot):
             (self.dof_pos[:, 6]) / self.cfg.normalization.obs_scales.dof_pos)
         
         
-        error += self.sqrdexp(
-            (self.dof_pos[:, 4]) / self.cfg.normalization.obs_scales.dof_pos)
-        error += self.sqrdexp(
-            (self.dof_pos[:, 9]) / self.cfg.normalization.obs_scales.dof_pos)
+        # error += self.sqrdexp(
+        #     (self.dof_pos[:, 4]) / self.cfg.normalization.obs_scales.dof_pos)
+        # error += self.sqrdexp(
+        #     (self.dof_pos[:, 9]) / self.cfg.normalization.obs_scales.dof_pos)
         
         # error += self.sqrdexp(
         #     (self.dof_pos[:, 2]) / self.cfg.normalization.obs_scales.dof_pos)
@@ -466,6 +502,7 @@ class Humanoid(LeggedRobot):
         self.rwd_baseHeightPrev = self._reward_base_height()
         self.rwd_jointRegPrev = self._reward_joint_regularization()
         self.rwd_jointRegPrev_stand = self._reward_joint_regularization_stand()
+        self.rwd_foot_penalty = self._reward_foot_penalty()
 
     def _reward_ori_pb(self):
         delta_phi = ~self.reset_buf \
@@ -480,6 +517,11 @@ class Humanoid(LeggedRobot):
     def _reward_jointReg_pb_stand(self):
         delta_phi = ~self.reset_buf \
             * (self._reward_joint_regularization_stand() - self.rwd_jointRegPrev_stand)
+        return delta_phi / self.dt_step
+    
+    def _reward_jointReg_pb_foot_penalty(self):
+        delta_phi = ~self.reset_buf \
+            * (self._reward_foot_penalty() - self.rwd_foot_penalty)
         return delta_phi / self.dt_step
     
     def _reward_baseHeight_pb(self):
