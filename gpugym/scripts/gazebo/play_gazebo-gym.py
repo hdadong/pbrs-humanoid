@@ -103,7 +103,7 @@ def play(args):
     img_idx = 0
 
     play_log = []
-    env_gym.max_episode_length = 50
+    env_gym.max_episode_length = 100
     
     
     phase = torch.zeros(
@@ -115,6 +115,9 @@ def play(args):
     env_gym.initial_step()
     obs_gym = env_gym.get_observations()
     obs_gazebo = env_gazebo.get_observations()
+            # pos = [2, 1, 2] # for 1 robot
+        # lookat = [-10, -2.5, -16] # for 1 robot
+    env_gym.set_camera([2, 1, 2], [-10, -2.5, -16])
     for i in range(1000000000):       
         # obs = torch.zeros(
         #     1, 38, dtype=torch.float,
@@ -125,7 +128,7 @@ def play(args):
         # obs[:,7:10] = xxx                            # [3] Projected gravity
         #print('obs[:,7:10]', obs[:,7:10])
         
-        obs_gym[:,10:13] = torch.tensor([0.0, 0.0, 0.0], dtype=torch.float,device='cuda:0', requires_grad=False)  # [3] Velocity commands
+        obs_gym[:,10:13] = torch.tensor([0.6, 0.0, 0.0], dtype=torch.float,device='cuda:0', requires_grad=False)  # [3] Velocity commands
         #obs[:,13] = smooth_sqr_wave(phase)             # [1] Contact schedule
         #obs[:,14] = torch.sin(2*torch.pi*phase)        # [1] Phase variable
         #obs[:,15] = torch.cos(2*torch.pi*phase)        # [1] Phase variable
@@ -134,7 +137,7 @@ def play(args):
         # obs[:,35:37] = xxx                           # [2] Contact states 
         actions_gym = policy(obs_gym.detach())
         actions_gazebo = policy(obs_gazebo.detach())
-        
+        #print(actions_gazebo)
 
         # zero_action = torch.zeros_like(actions_gym)
         # zero_action[0][0] = 1.25
@@ -147,8 +150,8 @@ def play(args):
         # zero_action[0][7] = 0.5
         # zero_action[0][8] = -0.2
         # zero_action[0][9] = 0.1
-        obs_gym, _, rews, dones, infos   = env_gym.step(actions_gym.detach())
         if (i>100): 
+            obs_gym, _, rews, dones, infos   = env_gym.step(actions_gym.detach())
             obs_gazebo  = env_gazebo.step(actions_gazebo.detach(), obs_gym)
         else:  
             env_gazebo.gs.simulator.step_simulation()
@@ -162,42 +165,21 @@ def play(args):
             camera_position += camera_vel * env_gym.dt
             env_gym.set_camera(camera_position, camera_position + camera_direction)
 
-        if i < stop_state_log:
-            ### Humanoid PBRS Logging ###
-            # [ 1]  Timestep
-            # [38]  Agent observations
-            # [10]  Agent actions (joint setpoints)
-            # [13]  Floating base states in world frame
-            # [ 6]  Contact forces for feet
-            # [10]  Joint torques
-            play_log.append(
-                [i*env_gym.dt]
-                + obs_gym[robot_index, :].cpu().numpy().tolist()
-                + actions_gym[robot_index, :].detach().cpu().numpy().tolist()
-                + env_gym.root_states[0, :].detach().cpu().numpy().tolist()
-                + env_gym.contact_forces[robot_index, env_gym.end_eff_ids[0], :].detach().cpu().numpy().tolist()
-                + env_gym.contact_forces[robot_index, env_gym.end_eff_ids[1], :].detach().cpu().numpy().tolist()
-                + env_gym.torques[robot_index, :].detach().cpu().numpy().tolist()
-            )
-        elif i==stop_state_log:
-            np.savetxt('./play_log.csv', play_log, delimiter=',')
-            # logger.plot_states()
-        if  0 < i < stop_rew_log:
-            if infos["episode"]:
-                num_episodes = torch.sum(env_gym.reset_buf).item()
-                # if num_episodes>0:
-                    # logger.log_rewards(infos["episode"], num_episodes)
-        elif i==stop_rew_log:
-            logger.print_rewards()
 
-
-#  python gpugym/scripts/gazebo/play_gazebo-gym.py --task=pbrs:humanoid_bruce_stand
+#  python gpugym/scripts/gazebo/play_gazebo-gym.py --task=pbrs:humanoid_bruce --load_run Dec27_20-09-29_ICRA2023
 #  python gpugym/scripts/gazebo/play_gazebo-gym.py --task=pbrs:humanoid_bruce_stand --load_run Dec22_09-08-23_ICRA2023 --checkpoint 2000
 # python gpugym/scripts/gazebo/play_gazebo-gym.py --task=pbrs:humanoid_bruce_stand --load_run Dec21_23-28-54_ICRA2023 
 
 # python gpugym/scripts/gazebo/play_gazebo-gym.py --task=pbrs:humanoid_bruce_stand --load_run   Dec25_22-38-35_ICRA2023 --checkpoint 42550 42400-42550 good
 
 #Loading model from: /home/bigeast/pbrs-humanoid/logs/PBRS_HumanoidLocomotion/Dec25_22-38-35_ICRA2023/model_42400.pt
+# cd /home/bigeast/Downloads/BRUCE-BIGAI
+# python3 -m Startups.memory_manager
+# cd /home/bigeast/Downloads/BRUCE-BIGAI/Simulation/worlds
+#  gazebo --verbose bruce.world
+
+# python gpugym/scripts/gazebo/play_gazebo-gym.py --task=pbrs:humanoid_bruce_stand --load_run Dec30_14-10-49_ICRA2023 --checkpoint  5550
+# python gpugym/scripts/gazebo/play_gazebo-gym.py --task=pbrs:humanoid_bruce_stand --load_run Dec31_15-05-29_ICRA2023 --checkpoint 6600
 if __name__ == '__main__':
     EXPORT_POLICY = True
     EXPORT_CRITIC = True

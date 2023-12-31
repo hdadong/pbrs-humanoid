@@ -454,7 +454,7 @@ class LeggedRobot(BaseTask):
             self.commands[env_ids, 2] = torch_rand_float(self.command_ranges["ang_vel_yaw"][0], self.command_ranges["ang_vel_yaw"][1], (len(env_ids), 1), device=self.device).squeeze(1)
 
         # set small commands to zero
-        self.commands[env_ids, :2] *= (torch.norm(self.commands[env_ids, :2], dim=1) > 0.2).unsqueeze(1)
+        self.commands[env_ids, :2] *= (torch.norm(self.commands[env_ids, :2], dim=1) > 0.1).unsqueeze(1)
 
 
     # def _compute_torques(self, actions):
@@ -868,12 +868,13 @@ class LeggedRobot(BaseTask):
         # create some wrapper tensors for different slices
         self.root_states = gymtorch.wrap_tensor(actor_root_state)
         self.dof_state = gymtorch.wrap_tensor(dof_state_tensor)
-        self._rigid_body_state = gymtorch.wrap_tensor(rigid_body_state)
+        self.rigid_body_state = gymtorch.wrap_tensor(rigid_body_state)
         self.jacobians = gymtorch.wrap_tensor(jacobian_tensor)
         self.mass_matrices = gymtorch.wrap_tensor(mass_matrix_tensor)
         
-        self._rigid_body_pos = self._rigid_body_state.view(self.num_envs, self.num_bodies, 13)[..., 0:3]
-        self._rigid_body_vel = self._rigid_body_state.view(self.num_envs, self.num_bodies, 13)[..., 7:10]
+        self.rigid_body_pos = self.rigid_body_state.view(self.num_envs, self.num_bodies, 13)[..., 0:3]
+        self.rigid_body_rot = self.rigid_body_state.view(self.num_envs, self.num_bodies, 13)[..., 3:7]
+        self.rigid_body_vel = self.rigid_body_state.view(self.num_envs, self.num_bodies, 13)[..., 7:10]
         self.dof_pos = self.dof_state.view(self.num_envs, self.num_dof, 2)[..., 0]
         self.dof_vel = self.dof_state.view(self.num_envs, self.num_dof, 2)[..., 1]
         self.base_pos = self.root_states[:, 0:3]

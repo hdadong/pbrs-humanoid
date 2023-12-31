@@ -85,6 +85,7 @@ class GazeboSimulator:
         # self.leg_p_gains = [265, 150,  80,  80,    30]
         # self.leg_i_gains = [  0,   0,   0,   0,     0]
         # self.leg_d_gains = [ 1., 2.3, 0.8, 0.8, 0.003]
+        
         self.leg_p_gains = [265, 150,  80,  80,    250]
         self.leg_i_gains = [  0,   0,   0,   0,     0]
         self.leg_d_gains = [ 1., 2.3, 0.8,  1.0, 0.025]
@@ -136,7 +137,14 @@ class GazeboSimulator:
                         -1.5707963267948966+PI_2, 1.5553965422687077-PI_2,  0.5969977704117716, -0.9557276982676578, 0.3587299278558862,
                         ar1, ar2, ar3,
                         al1, al2, al3]
-
+        # self.initial_pose = [-1.57+PI_2, 1.577-PI_2, 0.59815, -1.021412, 0.412,
+        #                 -1.564+PI_2, 1.55-PI_2,  0.59, -1.055, 0.433,
+        #                 ar1, ar2, ar3,
+        #                 al1, al2, al3]
+        # self.initial_pose = [-1.5+PI_2, 1.5-PI_2, 0.57, -0.6, 0.0,
+        #                 -1.5+PI_2, 1.5-PI_2,  0.65, -0.8, 0.0,
+        #                 ar1, ar2, ar3,
+        #                 al1, al2, al3]
         print("self.initial_pose", self.initial_pose)
         self.simulator.reset_simulation(initial_pose=self.initial_pose)
         
@@ -513,7 +521,7 @@ class SimpleTask():
     def get_observations(self):
         
         obs = torch.zeros(
-            1, 36, dtype=torch.float,
+            1, 46, dtype=torch.float,
             device=self.device, requires_grad=False)
 
         gs_observation = self.gs.get_observation()
@@ -586,6 +594,8 @@ class SimpleTask():
         obs[:,26:36] = joint_velocities                          # [10] Joint velocities
         #obs[:,36:38] = torch.tensor([gs_observation['contact_states'][1], gs_observation['contact_states'][0]],dtype=torch.float,device=self.device, requires_grad=False)                                  # [2] Contact states
         #print("obs", obs)
+        obs[:,36:46] = torch.zeros(10, dtype=torch.float,device=self.device, requires_grad=False)
+
         self.phase = torch.fmod(self.phase + self.dt, 1.0)
 
         return obs
@@ -690,7 +700,7 @@ class SimpleTask():
             self.Bruce.stop_threading()
 
 
-        for _ in range(self.decimation):
+        for deci in range(self.decimation):
             self.num_step+=1
 
             self.gs.update_sensor_info()
@@ -857,13 +867,14 @@ class SimpleTask():
             ]
             #action_16[:,10:16] =  torch.tensor(default_pos[10:16], device=self.device).unsqueeze(0).repeat(self.num_envs, 1)
             #self.gs.write_torque(leg_goal_torques, arm_goal_torques)
+
             self.gs.write_position(goal_positions, default_pos[10:16])
             self.gs.simulator.step_simulation()
             time.sleep(0.000)  # delay if needed
             
         
         obs = torch.zeros(
-            1, 36, dtype=torch.float,
+            1, 46, dtype=torch.float,
             device=self.device, requires_grad=False)
 
 
@@ -885,6 +896,8 @@ class SimpleTask():
         obs[:,15] = torch.cos(2*torch.pi*self.phase)        # [1] Phase variable
         obs[:,16:26] = joint_positions[0,:10]                                  # [10] Joint states
         obs[:,26:36] = joint_velocities[0,:10]                          # [10] Joint velocities
+        obs[:,36:46] = actions.clone()
+        
         # obs[:,16:26] = obs_gym[:,16:26]
         # obs[:,16:26] = obs_gym[:,16:26]
         #obs[:,13:16] = obs_gym[:,13:16]
@@ -899,7 +912,7 @@ class SimpleTask():
         self.gazebo_velocity.append(joint_velocities[0,:10].cpu().numpy())
         self.gym_velocity.append(obs_gym[0,26:36].cpu().numpy())
         
-        if len(self.gazebo_position) == 50:
+        if len(self.gazebo_position) == 200:
 
             gazebo_position_arr = np.zeros((len(self.gazebo_position),10))
             gym_position_arr = np.zeros((len(self.gym_position),10))

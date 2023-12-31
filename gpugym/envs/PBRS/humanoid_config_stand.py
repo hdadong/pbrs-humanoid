@@ -11,7 +11,7 @@ from gpugym.envs.base.legged_robot_config \
 class HumanoidCfg(LeggedRobotCfg):
     class env(LeggedRobotCfg.env):
         num_envs = 4096
-        num_observations = 36
+        num_observations = 46
         num_actions = 10
         episode_length_s = 5
 
@@ -536,7 +536,7 @@ class HumanoidCfg(LeggedRobotCfg):
             dof_pos_limits = -10
             torque_limits = -1e-2
             termination = -100
-
+            feet_air_time = 5.0
             # * Shaping rewards * #
             # Sweep values: [0.5, 2.5, 10, 25., 50.]
             # Default: 5.0
