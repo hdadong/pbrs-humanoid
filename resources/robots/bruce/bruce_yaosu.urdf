@@ -920,6 +920,7 @@ __status__    = "Production"
         izz="7.103E-05" />
     </inertial>
     <visual>
+    
       <origin
         xyz="0 0 0"
         rpy="0 0 0" />
